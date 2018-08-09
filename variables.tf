@@ -174,6 +174,7 @@ variable "target_groups_count" {
   description = "The number of target groups to create"
   type        = "string"
   default     = 1
+}
 
 variable "target_groups" {
   description = "A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target_groups_defaults variable. i.e. [{'name', 'foo', 'backend_protocol', 'HTTP', 'backend_port', '80'}]"
