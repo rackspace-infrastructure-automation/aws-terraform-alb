@@ -15,7 +15,7 @@ resource "random_string" "rstring" {
 resource "aws_security_group" "test_sg" {
   name        = "${random_string.rstring.result}-test-sg-0"
   description = "Test SG Group"
-  vpc_id      = "${module.vpc.id}"
+  vpc_id      = "${module.vpc.vpc_id}"
 
   ingress {
     from_port   = 0
@@ -34,13 +34,13 @@ resource "aws_security_group" "test_sg" {
 
 resource "aws_subnet" "test_subnet_primary" {
   cidr_block        = "10.0.1.0/24"
-  vpc_id            = "${module.vpc.id}"
+  vpc_id            = "${module.vpc.vpc_id}"
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 }
 
 resource "aws_subnet" "test_subnet_secondary" {
   cidr_block        = "10.0.2.0/24"
-  vpc_id            = "${module.vpc.id}"
+  vpc_id            = "${module.vpc.vpc_id}"
   availability_zone = "${data.aws_availability_zones.available.names[1]}"
 }
 
@@ -51,7 +51,7 @@ module "vpc" {
 }
 
 resource "aws_internet_gateway" "test_gw" {
-  vpc_id = "${module.vpc.id}"
+  vpc_id = "${module.vpc.vpc_id}"
 }
 
 module "alb" {
@@ -60,7 +60,7 @@ module "alb" {
   alb_name        = "${random_string.rstring.result}-test-alb"
   security_groups = "${list(aws_security_group.test_sg.id)}"
   subnets         = "${list(aws_subnet.test_subnet_primary.id, aws_subnet.test_subnet_secondary.id)}"
-  vpc_id          = "${module.vpc.id}"
+  vpc_id          = "${module.vpc.vpc_id}"
 
   create_logging_bucket       = false
   http_listeners_count        = 0
