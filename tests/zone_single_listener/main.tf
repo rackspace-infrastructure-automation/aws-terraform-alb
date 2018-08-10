@@ -32,22 +32,13 @@ resource "aws_security_group" "test_sg" {
   }
 }
 
-resource "aws_subnet" "test_subnet_primary" {
-  cidr_block        = "10.0.1.0/24"
-  vpc_id            = "${module.vpc.vpc_id}"
-  availability_zone = "${data.aws_availability_zones.available.names[0]}"
-}
-
-resource "aws_subnet" "test_subnet_secondary" {
-  cidr_block        = "10.0.2.0/24"
-  vpc_id            = "${module.vpc.vpc_id}"
-  availability_zone = "${data.aws_availability_zones.available.names[1]}"
-}
-
 module "vpc" {
-  source     = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.1"
-  cidr_range = "10.0.0.0/16"
-  vpc_name   = "${random_string.rstring.result}-test"
+  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.1"
+  az_count            = 2
+  cidr_range          = "10.0.0.0/16"
+  public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
+  private_cidr_ranges = ["10.0.2.0/24", "10.0.4.0/24"]
+  vpc_name            = "${random_string.rstring.result}-test"
 }
 
 resource "aws_internet_gateway" "test_gw" {
@@ -60,7 +51,7 @@ module "alb" {
   # Required
   alb_name        = "${random_string.rstring.result}-test-alb"
   security_groups = "${list(aws_security_group.test_sg.id)}"
-  subnets         = "${list(aws_subnet.test_subnet_primary.id, aws_subnet.test_subnet_secondary.id)}"
+  subnets         = "${module.vpc.public_subnets}"
 
   vpc_id = "${module.vpc.vpc_id}"
 
