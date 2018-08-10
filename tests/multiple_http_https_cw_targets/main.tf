@@ -41,10 +41,6 @@ module "vpc" {
   vpc_name            = "${random_string.rstring.result}-test"
 }
 
-resource "aws_internet_gateway" "test_gw" {
-  vpc_id = "${module.vpc.vpc_id}"
-}
-
 data "aws_ami" "ubuntu" {
   most_recent = true
 
