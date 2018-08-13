@@ -30,7 +30,8 @@ module "alb" {
   vpc_id             = "${var.vpc_id}"
 
   # Optional Values
-  log_bucket_name          = "${var.create_logging_bucket ? aws_s3_bucket.log_bucket.id:var.logging_bucket_name}"
+  logging_enabled          = "${var.create_logging_bucket || var.logging_bucket_name != "" ? true:false}"
+  log_bucket_name          = "${var.create_logging_bucket ? element(concat(aws_s3_bucket.log_bucket.*.id, list("")), 0):var.logging_bucket_name}"
   log_location_prefix      = "${var.logging_bucket_prefix}"
   tags                     = "${var.alb_tags}"
   http_tcp_listeners_count = "${var.http_listeners_count}"
@@ -156,6 +157,6 @@ resource "aws_lb_target_group_attachment" "target_group_instance" {
   count = "${var.register_instance_targets_count > 0 ? var.register_instance_targets_count:0}"
 
   # to match the instances to the
-  target_group_arn = "${ module.alb.target_group_arns[lookup(var.register_instance_targets[count.index], "target_group_index")] }"
+  target_group_arn = "${ module.alb.target_group_arns[lookup(var.register_instance_targets[count.index], "target_group_index")]}"
   target_id        = "${ lookup(var.register_instance_targets[count.index], "instance_id") }"
 }

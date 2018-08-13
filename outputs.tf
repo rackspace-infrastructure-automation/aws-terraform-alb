@@ -62,32 +62,32 @@ output "target_group_names" {
 #################
 
 output "logging_bucket_id" {
-  value       = "${aws_s3_bucket.log_bucket.id}"
+  value       = "${aws_s3_bucket.log_bucket.*.id}"
   description = "The name of the bucket."
 }
 
 output "logging_bucket_arn" {
-  value       = "${aws_s3_bucket.log_bucket.arn}"
+  value       = "${aws_s3_bucket.log_bucket.*.arn}"
   description = "The ARN of the bucket. Will be of format arn:aws:s3:::bucketname."
 }
 
 output "logging_bucket_domain_name" {
-  value       = "${aws_s3_bucket.log_bucket.bucket_domain_name}"
+  value       = "${aws_s3_bucket.log_bucket.*.bucket_domain_name}"
   description = "The bucket domain name. Will be of format bucketname.s3.amazonaws.com."
 }
 
 output "logging_bucket_regional_domain_name" {
-  value       = "${aws_s3_bucket.log_bucket.bucket_regional_domain_name}"
+  value       = "${aws_s3_bucket.log_bucket.*.bucket_regional_domain_name}"
   description = "The bucket region-specific domain name. The bucket domain name including the region name."
 }
 
 output "logging_bucket_hosted_zone_id" {
-  value       = "${aws_s3_bucket.log_bucket.hosted_zone_id}"
+  value       = "${aws_s3_bucket.log_bucket.*.hosted_zone_id}"
   description = "The Route 53 Hosted Zone ID for this bucket's region."
 }
 
 output "logging_bucket_region" {
-  value       = "${aws_s3_bucket.log_bucket.region}"
+  value       = "${aws_s3_bucket.log_bucket.*.region}"
   description = "The AWS region this bucket resides in."
 }
 
@@ -96,6 +96,6 @@ output "logging_bucket_region" {
 #################
 
 output "unhealthy_host_alarm_id" {
-  value       = "${var.rackspace_ticket_enabled && var.target_groups_count > 0 ? aws_cloudwatch_metric_alarm.unhealthy_host_count_alarm.id:""}"
+  value       = "${aws_cloudwatch_metric_alarm.unhealthy_host_count_alarm.*.id}"
   description = "The ID of the health check."
 }

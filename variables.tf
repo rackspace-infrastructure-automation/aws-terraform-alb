@@ -173,7 +173,7 @@ variable "subnets" {
 variable "target_groups_count" {
   description = "The number of target groups to create"
   type        = "string"
-  default     = 0
+  default     = 1
 }
 
 variable "target_groups" {

@@ -1,5 +1,10 @@
+provider "aws" {
+  version = "~> 1.2"
+  region  = "us-west-2"
+}
+
 module "alb" {
-  source = "path/to/module"
+  source = "git@github.com/rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.1"
 
   #################
   #      ALB      #
