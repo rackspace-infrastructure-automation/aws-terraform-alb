@@ -17,6 +17,8 @@ locals {
   }
 
   merged_tags = "${merge(local.default_tags, var.alb_tags)}"
+
+  waf_id = "329d10ec-e221-49d1-9f4b-e1294150d292"
 }
 
 module "alb" {
@@ -159,4 +161,10 @@ resource "aws_lb_target_group_attachment" "target_group_instance" {
   # to match the instances to the
   target_group_arn = "${ module.alb.target_group_arns[lookup(var.register_instance_targets[count.index], "target_group_index")]}"
   target_id        = "${ lookup(var.register_instance_targets[count.index], "instance_id") }"
+}
+
+resource "aws_wafregional_web_acl_association" "alb_waf" {
+  count        = "${var.add_waf ? 1:0}"
+  resource_arn = "${module.alb.load_balancer_id}"
+  web_acl_id   = "${var.waf_id}"
 }

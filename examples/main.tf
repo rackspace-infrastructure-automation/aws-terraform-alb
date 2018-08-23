@@ -97,4 +97,9 @@ module "alb" {
   logging_bucket_encryption_kms_mster_key = ""
   logging_bucket_name                     = "<bucket_name>"
   logging_bucket_retention                = 14
+  #################
+  #      WAF      #
+  #################
+  add_waf = true
+  waf_id = "<waf_id>"
 }
