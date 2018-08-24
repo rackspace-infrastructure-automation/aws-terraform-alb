@@ -17,8 +17,6 @@ locals {
   }
 
   merged_tags = "${merge(local.default_tags, var.alb_tags)}"
-
-  waf_id = "329d10ec-e221-49d1-9f4b-e1294150d292"
 }
 
 module "alb" {
