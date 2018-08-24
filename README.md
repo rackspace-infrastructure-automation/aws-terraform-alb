@@ -3,6 +3,7 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
+| add_waf | Add an existing Regional WAF to the ALB. true | false | string | `false` | no |
 | alb_name | A name for the load balancer, which must be unique within your AWS account. | string | - | yes |
 | alb_tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | map | `<map>` | no |
 | create_internal_zone_record | Create Route 53 internal zone record for the ALB. i.e true | false | string | `true` | no |
@@ -33,9 +34,10 @@
 | security_groups | A list of EC2 security group ids to assign to this resource. i.e. ['sg-edcd9784', 'sg-edcd9785'] | list | - | yes |
 | subnets | A list of at least two IDs of the subnets to associate with the load balancer. i.e ['subnet-abcde012', 'subnet-bcde012a'] | list | - | yes |
 | target_groups | A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target_groups_defaults variable. i.e. [{'name', 'foo', 'backend_protocol', 'HTTP', 'backend_port', '80'}] | list | `<list>` | no |
-| target_groups_count | The number of target groups to create | string | `0` | no |
+| target_groups_count | The number of target groups to create | string | `1` | no |
 | target_groups_defaults | Default values for target groups as defined by the list of maps. i.e. [{ 'cookie_duration': 86400, 'deregistration_delay': 300, 'health_check_healthy_threshold': 3, 'health_check_interval': 10, 'health_check_matcher': '200-299', 'health_check_path': '/', 'health_check_port': 'traffic-port', 'health_check_timeout': 5, 'health_check_unhealthy_threshold': 3, 'stickiness_enabled': true, 'target_type': 'instance' }] | list | `<list>` | no |
 | vpc_id | The VPC in which your targets are located. i.e. vpc-abcde012 | string | - | yes |
+| waf_id | The unique identifier (ID) for the Regional Web Application Firewall (WAF) ACL. i.e. 329d10ec-e221-49d1-9f4b-e1294150d292 | string | `` | no |
 
 ## Outputs
 

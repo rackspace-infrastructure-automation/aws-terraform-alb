@@ -160,3 +160,9 @@ resource "aws_lb_target_group_attachment" "target_group_instance" {
   target_group_arn = "${ module.alb.target_group_arns[lookup(var.register_instance_targets[count.index], "target_group_index")]}"
   target_id        = "${ lookup(var.register_instance_targets[count.index], "instance_id") }"
 }
+
+resource "aws_wafregional_web_acl_association" "alb_waf" {
+  count        = "${var.add_waf ? 1:0}"
+  resource_arn = "${module.alb.load_balancer_id}"
+  web_acl_id   = "${var.waf_id}"
+}

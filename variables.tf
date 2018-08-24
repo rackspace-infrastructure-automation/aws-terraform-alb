@@ -222,3 +222,15 @@ variable "vpc_id" {
   description = "The VPC in which your targets are located. i.e. vpc-abcde012"
   type        = "string"
 }
+
+variable "add_waf" {
+  description = "Add an existing Regional WAF to the ALB. true | false"
+  type        = "string"
+  default     = false
+}
+
+variable "waf_id" {
+  description = "The unique identifier (ID) for the Regional Web Application Firewall (WAF) ACL. i.e. 329d10ec-e221-49d1-9f4b-e1294150d292"
+  type        = "string"
+  default     = ""
+}
