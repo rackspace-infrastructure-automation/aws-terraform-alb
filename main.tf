@@ -19,18 +19,22 @@ locals {
   merged_tags = "${merge(local.default_tags, var.alb_tags)}"
 
   alarm_actions = "${var.rackspace_ticket_enabled ? "enabled":"disabled"}"
+
   alarm_action_config = {
     enabled = [
       "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
     ]
+
     disabled = "${list()}"
   }
 
   ok_actions = "${var.rackspace_ticket_enabled ? "enabled":"disabled"}"
+
   ok_action_config = {
     enabled = [
       "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
     ]
+
     disabled = "${list()}"
   }
 }
