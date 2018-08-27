@@ -163,9 +163,9 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count_alarm" {
     TargetGroup  = "${module.alb.target_group_arn_suffixes[count.index]}"
   }
 
-  alarm_actions = "${local.alarm_actions[local.alarm_action_config]}"
+  alarm_actions = "${local.alarm_action_config[local.alarm_actions]}"
 
-  ok_actions = "${local.ok_actions[local.ok_action_config]}"
+  ok_actions = "${local.ok_action_config[local.ok_actions]}"
 }
 
 # join ec2 instances to target group
