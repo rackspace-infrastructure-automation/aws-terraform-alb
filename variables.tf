@@ -137,6 +137,12 @@ variable "logging_bucket_retention" {
   default     = 14
 }
 
+variable "rackspace_managed" {
+  description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
+  type        = "string"
+  default     = true
+}
+
 variable "rackspace_ticket_enabled" {
   description = "Specifies whether alarms will generate Rackspace tickets. i.e. true | false"
   type        = "string"
