@@ -22,7 +22,7 @@ locals {
 
   alarm_action_config = {
     enabled = [
-      "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
+      ["arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency"],
     ]
 
     disabled = "${list()}"
@@ -32,7 +32,7 @@ locals {
 
   ok_action_config = {
     enabled = [
-      "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
+      ["arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency"],
     ]
 
     disabled = "${list()}"
