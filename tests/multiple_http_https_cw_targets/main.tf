@@ -108,7 +108,7 @@ module "alb" {
     },
   ]
 
-  rackspace_ticket_enabled = true
+  rackspace_managed = true
 
   internal_zone_name   = "dev.mupo181ve1jco37.net"
   internal_record_name = "alb.mupo181ve1jco37.net"

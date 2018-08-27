@@ -143,12 +143,6 @@ variable "rackspace_managed" {
   default     = true
 }
 
-variable "rackspace_ticket_enabled" {
-  description = "Specifies whether alarms will generate Rackspace tickets. i.e. true | false"
-  type        = "string"
-  default     = false
-}
-
 variable "register_instance_targets_count" {
   description = "Count of ec2 instances being added to the target groups."
   type        = "string"

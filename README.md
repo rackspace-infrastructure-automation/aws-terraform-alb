@@ -28,7 +28,6 @@
 | logging_bucket_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | string | `` | no |
 | logging_bucket_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | string | `14` | no |
 | rackspace_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | string | `true` | no |
-| rackspace_ticket_enabled | Specifies whether alarms will generate Rackspace tickets. i.e. true | false | string | `false` | no |
 | register_instance_targets | List of Maps with the index of the target group and the instance id being registered with that group. i.e. [{'instance_id' : 'i-052f1856e2a471b74', 'target_group_index' : 0}, {'instance_id' : 'i-0cc4b566324707026', 'target_group_index' : 0}] | list | `<list>` | no |
 | register_instance_targets_count | Count of ec2 instances being added to the target groups. | string | `0` | no |
 | route_53_hosted_zone_id | The Route53 Internal Hosted Zone ID. | string | - | yes |

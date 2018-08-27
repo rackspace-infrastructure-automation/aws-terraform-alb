@@ -17,26 +17,6 @@ locals {
   }
 
   merged_tags = "${merge(local.default_tags, var.alb_tags)}"
-
-  alarm_actions = "${var.rackspace_ticket_enabled ? "enabled":"disabled"}"
-
-  alarm_action_config = {
-    enabled = [
-      ["arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency"],
-    ]
-
-    disabled = "${list()}"
-  }
-
-  ok_actions = "${var.rackspace_ticket_enabled ? "enabled":"disabled"}"
-
-  ok_action_config = {
-    enabled = [
-      ["arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency"],
-    ]
-
-    disabled = "${list()}"
-  }
 }
 
 module "alb" {
@@ -163,9 +143,13 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count_alarm" {
     TargetGroup  = "${module.alb.target_group_arn_suffixes[count.index]}"
   }
 
-  alarm_actions = "${local.alarm_action_config[local.alarm_actions]}"
+  alarm_actions = [
+    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
+  ]
 
-  ok_actions = "${local.ok_action_config[local.ok_actions]}"
+  ok_actions = [
+    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
+  ]
 }
 
 # join ec2 instances to target group

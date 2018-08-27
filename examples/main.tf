@@ -77,7 +77,7 @@ module "alb" {
   #  CloudWatch   #
   #################
 
-  rackspace_ticket_enabled = true
+  rackspace_managed = true
 
   #################
   #   Route 53    #
