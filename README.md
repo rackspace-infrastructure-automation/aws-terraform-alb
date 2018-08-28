@@ -8,6 +8,8 @@
 | alb_tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | map | `<map>` | no |
 | create_internal_zone_record | Create Route 53 internal zone record for the ALB. i.e true | false | string | `true` | no |
 | create_logging_bucket | Create a new S3 logging bucket. i.e. true | false | string | `true` | no |
+| custom_alarm_sns_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarms. | list | `<list>` | no |
+| custom_ok_sns_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarm clearance. Most likely the same as the alarm to clear the alarm. | list | `<list>` | no |
 | enable_deletion_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | string | `false` | no |
 | environment | Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test') | string | `Development` | no |
 | extra_ssl_certs | A list of maps describing any extra SSL certificates to apply to the HTTPS listeners. Certificates must be in the same region as the ALB. Required key/values: certificate_arn, https_listener_index (the index of the listener within https_listeners which the cert applies toward). [{'certificate_arn', 'arn:aws:iam::123456789012:server-certificate/other_test_cert-123456789012', 'https_listener_index', 1}] | list | `<list>` | no |

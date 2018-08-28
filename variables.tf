@@ -143,6 +143,18 @@ variable "rackspace_managed" {
   default     = true
 }
 
+variable "custom_alarm_sns_topic" {
+  description = "If not using `rackspace_managed` set to a custom SNS topic ARN for alarms."
+  type        = "list"
+  default     = []
+}
+
+variable "custom_ok_sns_topic" {
+  description = "If not using `rackspace_managed` set to a custom SNS topic ARN for alarm clearance. Most likely the same as the alarm to clear the alarm."
+  type        = "list"
+  default     = []
+}
+
 variable "register_instance_targets_count" {
   description = "Count of ec2 instances being added to the target groups."
   type        = "string"
