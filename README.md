@@ -8,6 +8,8 @@
 | alb_tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | map | `<map>` | no |
 | create_internal_zone_record | Create Route 53 internal zone record for the ALB. i.e true | false | string | `true` | no |
 | create_logging_bucket | Create a new S3 logging bucket. i.e. true | false | string | `true` | no |
+| custom_alarm_sns_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarms. | list | `<list>` | no |
+| custom_ok_sns_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarm clearance. Most likely the same as the alarm to clear the alarm. | list | `<list>` | no |
 | enable_deletion_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | string | `false` | no |
 | environment | Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test') | string | `Development` | no |
 | extra_ssl_certs | A list of maps describing any extra SSL certificates to apply to the HTTPS listeners. Certificates must be in the same region as the ALB. Required key/values: certificate_arn, https_listener_index (the index of the listener within https_listeners which the cert applies toward). [{'certificate_arn', 'arn:aws:iam::123456789012:server-certificate/other_test_cert-123456789012', 'https_listener_index', 1}] | list | `<list>` | no |
@@ -27,7 +29,7 @@
 | logging_bucket_name | The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name. | string | `` | no |
 | logging_bucket_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | string | `` | no |
 | logging_bucket_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | string | `14` | no |
-| rackspace_ticket_enabled | Specifies whether alarms will generate Rackspace tickets. i.e. true | false | string | `false` | no |
+| rackspace_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | string | `true` | no |
 | register_instance_targets | List of Maps with the index of the target group and the instance id being registered with that group. i.e. [{'instance_id' : 'i-052f1856e2a471b74', 'target_group_index' : 0}, {'instance_id' : 'i-0cc4b566324707026', 'target_group_index' : 0}] | list | `<list>` | no |
 | register_instance_targets_count | Count of ec2 instances being added to the target groups. | string | `0` | no |
 | route_53_hosted_zone_id | The Route53 Internal Hosted Zone ID. | string | - | yes |

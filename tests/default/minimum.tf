@@ -57,4 +57,6 @@ module "alb" {
   internal_record_name    = ""
   internal_zone_name      = ""
   route_53_hosted_zone_id = ""
+
+  rackspace_managed = true
 }
