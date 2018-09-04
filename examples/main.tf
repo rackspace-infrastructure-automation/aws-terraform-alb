@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 module "alb" {
-  source = "git@github.com/rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.3"
 
   #################
   #      ALB      #
