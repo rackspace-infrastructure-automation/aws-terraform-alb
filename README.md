@@ -26,11 +26,6 @@ module "alb" {
    "backend_protocol" = "HTTP"
    "backend_port"     = 80
  }]*
-
- create_internal_zone_record = false
- internal_record_name        = ""
- internal_zone_name          = ""
- route_53_hosted_zone_id     = ""
 }
 ```
 
@@ -45,7 +40,7 @@ Full working references are available at [examples](examples)
 | add_waf | Add an existing Regional WAF to the ALB. true | false | string | `false` | no |
 | alb_name | A name for the load balancer, which must be unique within your AWS account. | string | - | yes |
 | alb_tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | map | `<map>` | no |
-| create_internal_zone_record | Create Route 53 internal zone record for the ALB. i.e true | false | string | `true` | no |
+| create_internal_zone_record | Create Route 53 internal zone record for the ALB. i.e true | false | string | `false` | no |
 | create_logging_bucket | Create a new S3 logging bucket. i.e. true | false | string | `true` | no |
 | custom_alarm_sns_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarms. | list | `<list>` | no |
 | custom_ok_sns_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarm clearance. Most likely the same as the alarm to clear the alarm. | list | `<list>` | no |
@@ -58,8 +53,8 @@ Full working references are available at [examples](examples)
 | https_listeners | List of Maps of HTTPS listeners. Certificate must be in the same region as the ALB. (port, certificate_arn, ssl_policy (optional: defaults to ELBSecurityPolicy-2016-08), target_group_index (optional: defaults to 0)) i.e. [{'certificate_arn', 'arn:aws:iam::123456789012:server-certificate/test_cert-123456789012', 'port', 443}] | list | `<list>` | no |
 | https_listeners_count | The number of HTTPS listeners to be created. | string | `0` | no |
 | idle_timeout | The idle timeout value, in seconds. The valid range is 1-3600. The default is 60 seconds. | string | `60` | no |
-| internal_record_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. alb.aws.com | string | - | yes |
-| internal_zone_name | TLD for Internal Hosted Zone. i.e. dev.example.com | string | - | yes |
+| internal_record_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. alb.aws.com | string | `` | no |
+| internal_zone_name | TLD for Internal Hosted Zone. i.e. dev.example.com | string | `` | no |
 | load_balancer_is_internal | Indicates whether the load balancer is Internet-facing or internal. i.e. true | false | string | `false` | no |
 | logging_bucket_acl | Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl | string | `bucket-owner-full-control` | no |
 | logging_bucket_encryption_kms_mster_key | The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse_algorithm as aws:kms. | string | `` | no |
@@ -71,7 +66,7 @@ Full working references are available at [examples](examples)
 | rackspace_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | string | `true` | no |
 | register_instance_targets | List of Maps with the index of the target group and the instance id being registered with that group. i.e. [{'instance_id' : 'i-052f1856e2a471b74', 'target_group_index' : 0}, {'instance_id' : 'i-0cc4b566324707026', 'target_group_index' : 0}] | list | `<list>` | no |
 | register_instance_targets_count | Count of ec2 instances being added to the target groups. | string | `0` | no |
-| route_53_hosted_zone_id | The Route53 Internal Hosted Zone ID. | string | - | yes |
+| route_53_hosted_zone_id | The Route53 Internal Hosted Zone ID. | string | `` | no |
 | security_groups | A list of EC2 security group ids to assign to this resource. i.e. ['sg-edcd9784', 'sg-edcd9785'] | list | - | yes |
 | subnets | A list of at least two IDs of the subnets to associate with the load balancer. i.e ['subnet-abcde012', 'subnet-bcde012a'] | list | - | yes |
 | target_groups | A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target_groups_defaults variable. i.e. [{'name', 'foo', 'backend_protocol', 'HTTP', 'backend_port', '80'}] | list | `<list>` | no |
