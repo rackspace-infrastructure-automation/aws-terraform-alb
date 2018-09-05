@@ -1,3 +1,44 @@
+/**
+ * # aws-terraform-alb
+ *This module deploys an Application Load Balancer with associated resources, such as an unhealthy host count CloudWatch alarm, S3 log bucket, and Route 53 internal zone record.
+ *
+ *## Basic Usage
+ *
+ *```
+ *module "alb" {
+ *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.3"
+ *
+ *  alb_name        = "MyALB"
+ *  security_groups = ["${module.sg.public_web_security_group_id}"]
+ *  subnets         = ["${module.vpc.public_subnets}"]
+ *  vpc_id          = "${module.vpc.vpc_id}"
+ *
+ *  http_listeners_count = 1
+ *
+ *  http_listeners = [{
+ *    port     = 80
+ *    protocol = "HTTP"
+ *  }]
+ *
+ *  target_groups_count = 1
+ *
+ *  target_groups = [{
+ *    "name"             = "MyTargetGroup"
+ *    "backend_protocol" = "HTTP"
+ *    "backend_port"     = 80
+ *  }]*
+ *
+ *  create_internal_zone_record = false
+ *  internal_record_name        = ""
+ *  internal_zone_name          = ""
+ *  route_53_hosted_zone_id     = ""
+ *}
+ *```
+ *
+ * Full working references are available at [examples](examples)
+ *
+ */
+
 data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
@@ -52,7 +93,7 @@ module "alb" {
 
   # Optional Values
   logging_enabled          = "${var.create_logging_bucket || var.logging_bucket_name != "" ? true:false}"
-  log_bucket_name          = "${var.create_logging_bucket ? element(concat(aws_s3_bucket.log_bucket.*.id, list("")), 0):var.logging_bucket_name}"
+  log_bucket_name          = "${var.create_logging_bucket ? element(concat(aws_s3_bucket_policy.log_bucket_policy.*.bucket, list("")), 0):var.logging_bucket_name}"
   log_location_prefix      = "${var.logging_bucket_prefix}"
   tags                     = "${var.alb_tags}"
   http_tcp_listeners_count = "${var.http_listeners_count}"
