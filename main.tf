@@ -27,11 +27,6 @@
  *    "backend_protocol" = "HTTP"
  *    "backend_port"     = 80
  *  }]*
- *
- *  create_internal_zone_record = false
- *  internal_record_name        = ""
- *  internal_zone_name          = ""
- *  route_53_hosted_zone_id     = ""
  *}
  *```
  *

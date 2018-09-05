@@ -54,10 +54,10 @@ module "alb" {
   # Optional
   create_logging_bucket = false
 
-  internal_zone_name   = "dev.mupo181ve1jco37.net"
-  internal_record_name = "alb.mupo181ve1jco37.net"
-
-  route_53_hosted_zone_id = "Z34VQ0W1VUIFLH"
+  create_internal_zone_record = true
+  internal_zone_name          = "dev.mupo181ve1jco37.net"
+  internal_record_name        = "alb.mupo181ve1jco37.net"
+  route_53_hosted_zone_id     = "Z34VQ0W1VUIFLH"
 
   alb_tags = {
     "RightSaid" = "Fred"

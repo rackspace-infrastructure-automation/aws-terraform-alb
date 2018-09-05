@@ -49,14 +49,9 @@ module "alb" {
   subnets         = "${module.vpc.public_subnets}"
   vpc_id          = "${module.vpc.vpc_id}"
 
-  create_logging_bucket       = false
-  http_listeners_count        = 0
-  target_groups_count         = 0
-  create_internal_zone_record = false
-
-  internal_record_name    = ""
-  internal_zone_name      = ""
-  route_53_hosted_zone_id = ""
+  create_logging_bucket = false
+  http_listeners_count  = 0
+  target_groups_count   = 0
 
   rackspace_managed = true
 }

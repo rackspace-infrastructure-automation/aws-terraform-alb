@@ -12,7 +12,7 @@ variable "alb_tags" {
 variable "create_internal_zone_record" {
   description = "Create Route 53 internal zone record for the ALB. i.e true | false"
   type        = "string"
-  default     = true
+  default     = false
 }
 
 variable "create_logging_bucket" {
@@ -82,11 +82,13 @@ variable "idle_timeout" {
 variable "internal_record_name" {
   description = "Record Name for the new Resource Record in the Internal Hosted Zone. i.e. alb.aws.com"
   type        = "string"
+  default     = ""
 }
 
 variable "internal_zone_name" {
   description = "TLD for Internal Hosted Zone. i.e. dev.example.com"
   type        = "string"
+  default     = ""
 }
 
 variable "load_balancer_is_internal" {
@@ -170,6 +172,7 @@ variable "register_instance_targets" {
 variable "route_53_hosted_zone_id" {
   description = "The Route53 Internal Hosted Zone ID."
   type        = "string"
+  default     = ""
 }
 
 variable "security_groups" {
