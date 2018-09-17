@@ -33,6 +33,10 @@
  * Full working references are available at [examples](examples)
  *
  */
+resource "random_string" "alarm_string" {
+  length  = 8
+  special = false
+}
 
 data "aws_caller_identity" "current" {}
 
@@ -184,7 +188,7 @@ resource "aws_route53_record" "zone_record_alias" {
 resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count_alarm" {
   count = "${var.target_groups_count > 0 ? var.target_groups_count:0}"
 
-  alarm_name          = "${format("%v_unhealthy_host_count_alarm", var.alb_name)}"
+  alarm_name          = "${format("%v_unhealthy_host_count_alarm-${random_string.alarm_string.output}", var.alb_name)}"
   alarm_description   = "Unhealthy Host count is greater than or equal to threshold, creating ticket."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 10
