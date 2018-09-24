@@ -53,8 +53,7 @@ Full working references are available at [examples](examples)
 | https_listeners | List of Maps of HTTPS listeners. Certificate must be in the same region as the ALB. (port, certificate_arn, ssl_policy (optional: defaults to ELBSecurityPolicy-2016-08), target_group_index (optional: defaults to 0)) i.e. [{'certificate_arn', 'arn:aws:iam::123456789012:server-certificate/test_cert-123456789012', 'port', 443}] | list | `<list>` | no |
 | https_listeners_count | The number of HTTPS listeners to be created. | string | `0` | no |
 | idle_timeout | The idle timeout value, in seconds. The valid range is 1-3600. The default is 60 seconds. | string | `60` | no |
-| internal_record_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. alb.aws.com | string | `` | no |
-| internal_zone_name | TLD for Internal Hosted Zone. i.e. dev.example.com | string | `` | no |
+| internal_record_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. alb.example.com | string | `` | no |
 | load_balancer_is_internal | Indicates whether the load balancer is Internet-facing or internal. i.e. true | false | string | `false` | no |
 | logging_bucket_acl | Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl | string | `bucket-owner-full-control` | no |
 | logging_bucket_encryption_kms_mster_key | The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse_algorithm as aws:kms. | string | `` | no |
