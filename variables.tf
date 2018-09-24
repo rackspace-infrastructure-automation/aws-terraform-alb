@@ -80,13 +80,7 @@ variable "idle_timeout" {
 }
 
 variable "internal_record_name" {
-  description = "Record Name for the new Resource Record in the Internal Hosted Zone. i.e. alb.aws.com"
-  type        = "string"
-  default     = ""
-}
-
-variable "internal_zone_name" {
-  description = "TLD for Internal Hosted Zone. i.e. dev.example.com"
+  description = "Record Name for the new Resource Record in the Internal Hosted Zone. i.e. alb.example.com"
   type        = "string"
   default     = ""
 }

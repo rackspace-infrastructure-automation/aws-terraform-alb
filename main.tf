@@ -168,7 +168,7 @@ POLICY
 # create r53 record with alias
 resource "aws_route53_record" "zone_record_alias" {
   count   = "${var.create_internal_zone_record ? 1:0}"
-  name    = "${var.internal_zone_name}"
+  name    = "${var.internal_record_name}"
   type    = "A"
   zone_id = "${var.route_53_hosted_zone_id}"
 

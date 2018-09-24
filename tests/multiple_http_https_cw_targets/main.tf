@@ -111,7 +111,6 @@ module "alb" {
   rackspace_managed = true
 
   create_internal_zone_record = true
-  internal_zone_name          = "dev.mupo181ve1jco37.net"
   internal_record_name        = "alb.mupo181ve1jco37.net"
   route_53_hosted_zone_id     = "Z34VQ0W1VUIFLH"
 

@@ -83,7 +83,6 @@ module "alb" {
   #################
   create_internal_zone_record = true
   internal_record_name    = "alb.example.com"
-  internal_zone_name      = "dev.example.com"
   route_53_hosted_zone_id = "<zone_id>"
 
   #################
