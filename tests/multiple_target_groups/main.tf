@@ -58,6 +58,8 @@ module "alb" {
   internal_record_name        = "alb.mupo181ve1jco37.net"
   route_53_hosted_zone_id     = "Z34VQ0W1VUIFLH"
 
+  unhealthy_host_count_threshold = 2
+
   alb_tags = {
     "RightSaid" = "Fred"
     "LeftSaid"  = "George"

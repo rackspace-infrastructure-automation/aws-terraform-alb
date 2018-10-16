@@ -227,6 +227,12 @@ variable "target_groups_defaults" {
   }]
 }
 
+variable "unhealthy_host_count_threshold" {
+  description = "The Unhealthy Host count threshold. When greater than or equal to threshold, an alarm is triggered."
+  type        = "string"
+  default     = 1
+}
+
 variable "vpc_id" {
   description = "The VPC in which your targets are located. i.e. vpc-abcde012"
   type        = "string"

@@ -191,7 +191,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count_alarm" {
   namespace           = "AWS/ApplicationELB"
   period              = 60
   statistic           = "Maximum"
-  threshold           = 1
+  threshold           = "${var.unhealthy_host_count_threshold}"
   unit                = "Count"
 
   dimensions {
