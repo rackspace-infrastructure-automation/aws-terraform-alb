@@ -97,6 +97,7 @@ module "alb" {
   target_groups_count      = "${var.target_groups_count}"
   target_groups            = "${var.target_groups}"
   target_groups_defaults   = "${var.target_groups_defaults}"
+  enable_http2             = "${var.enable_http2}"
 
   enable_deletion_protection = "${var.enable_deletion_protection}"
   load_balancer_is_internal  = "${var.load_balancer_is_internal}"

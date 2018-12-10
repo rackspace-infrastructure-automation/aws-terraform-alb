@@ -27,6 +27,12 @@ variable "enable_deletion_protection" {
   default     = false
 }
 
+variable "enable_http2" {
+  description = "If true sets HTTP/2 to enabled."
+  type        = "string"
+  default     = true
+}
+
 variable "environment" {
   description = "Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test')"
   type        = "string"
