@@ -1,103 +1,91 @@
+# Test Internal Zone Creation and HTTP Listener
+data "aws_availability_zones" "available" {}
+
 provider "aws" {
   version = "~> 1.2"
   region  = "us-west-2"
 }
 
-module "alb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.3"
+resource "random_string" "rstring" {
+  length  = 8
+  upper   = false
+  special = false
+}
 
-  #################
-  #      ALB      #
-  #################
+resource "aws_security_group" "test_sg" {
+  name        = "${random_string.rstring.result}-test-sg-1"
+  description = "Test SG Group"
+  vpc_id      = "${module.vpc.vpc_id}"
 
-  alb_name = "ALB Name"
-  alb_tags = {
-    RightSaid = "Fred"
-    LeftSaid  = "George"
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-  enable_deletion_protection = false
-  environment                = "Staging"
-  extra_ssl_certs_count      = 3
-  extra_ssl_certs = [{
-    certificate_arn      = "arn:aws:acm:<region>:<account>:certificate/<uuid>"
-    https_listener_index = 0
-  },
-    {
-      certificate_arn      = "arn:aws:acm:<region>:<account>:certificate/<uuid>"
-      https_listener_index = 0
-    },
-    {
-      certificate_arn      = "arn:aws:acm:<region>:<account>:certificate/<uuid>"
-      https_listener_index = 0
-    },
-  ]
-  http_listeners_count = 2
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+module "vpc" {
+  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.6"
+  az_count            = 2
+  cidr_range          = "10.0.0.0/16"
+  public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
+  private_cidr_ranges = ["10.0.2.0/24", "10.0.4.0/24"]
+  vpc_name            = "${random_string.rstring.result}-test"
+}
+
+module "alb" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.7"
+
+  # Required
+  alb_name        = "${random_string.rstring.result}-test-alb"
+  security_groups = "${list(aws_security_group.test_sg.id)}"
+  subnets         = "${module.vpc.public_subnets}"
+
+  vpc_id = "${module.vpc.vpc_id}"
+
+  # Optional
+  create_logging_bucket = false
+
+  create_internal_zone_record = true
+  internal_record_name        = "alb.mupo181ve1jco37.net"
+  route_53_hosted_zone_id     = "Z34VQ0W1VUIFLH"
+
+  alb_tags = {
+    "RightSaid" = "Fred"
+    "LeftSaid"  = "George"
+  }
+
+  http_listeners_count = 1
+
   http_listeners = [{
     port = 80
 
     protocol = "HTTP"
-  },
+  }]
+
+  https_listeners_count = 0
+  https_listeners       = []
+
+  target_groups_count = 2
+
+  target_groups = [
     {
-      port     = 8080
-      protocol = "HTTP"
+      "name"             = "Test-TG1"
+      "backend_protocol" = "HTTP"
+      "backend_port"     = 80
+    },
+    {
+      "name"             = "Test-TG2"
+      "backend_protocol" = "HTTP"
+      "backend_port"     = 80
     },
   ]
-  https_listeners_count = 1
-  https_listeners = [{
-    port            = 443
-    certificate_arn = "arn:aws:acm:<region>:<account>:certificate/<uuid>"
-  }]
-  idle_timeout                    = 60
-  security_groups                 = ["sg-<uuid>"]
-  load_balancer_is_internal       = false
-  register_instance_targets_count = 2
-  register_instance_targets = [{
-    "instance_id" = "i-<uuid>"
-
-    "target_group_index" = 0
-  },
-    {
-      "instance_id" = "i-<uuid>"
-
-      "target_group_index" = 0
-    },
-  ]
-  subnets             = ["subnet-<uuid>", "subnet-<uuid>"]
-  target_groups_count = 1
-  target_groups = [{
-    "name" = "NewALB-TG"
-
-    "backend_protocol" = "HTTP"
-
-    "backend_port" = 80
-  }]
-  vpc_id = "vpc-<uuid>"
-
-  #################
-  #  CloudWatch   #
-  #################
-
-  rackspace_managed = true
-  #################
-  #   Route 53    #
-  #################
-  create_internal_zone_record = true
-  internal_record_name    = "alb.example.com"
-  route_53_hosted_zone_id = "<zone_id>"
-
-  #################
-  #      S3       #
-  #################
-
-  create_logging_bucket                   = true
-  logging_bucket_acl                      = "bucket-owner-full-control"
-  logging_bucket_encyption                = "AES256"
-  logging_bucket_encryption_kms_mster_key = ""
-  logging_bucket_name                     = "<bucket_name>"
-  logging_bucket_retention                = 14
-  #################
-  #      WAF      #
-  #################
-  add_waf = true
-  waf_id = "<waf_id>"
 }
