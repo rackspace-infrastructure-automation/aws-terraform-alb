@@ -78,12 +78,12 @@ module "alb" {
 
   target_groups = [
     {
-      "name"             = "Test-TG1"
+      "name"             = "${random_string.rstring.result}-Test-TG1"
       "backend_protocol" = "HTTP"
       "backend_port"     = 80
     },
     {
-      "name"             = "Test-TG2"
+      "name"             = "${random_string.rstring.result}-Test-TG2"
       "backend_protocol" = "HTTP"
       "backend_port"     = 80
     },

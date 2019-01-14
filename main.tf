@@ -6,7 +6,7 @@
  *
  *```
  *module "alb" {
- *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.3"
+ *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.8"
  *
  *  alb_name        = "MyALB"
  *  security_groups = ["${module.sg.public_web_security_group_id}"]
@@ -33,9 +33,6 @@
  * Full working references are available at [examples](examples)
  *
  */
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
 
 data "aws_elb_service_account" "main" {}
 
@@ -52,27 +49,6 @@ locals {
   }
 
   merged_tags = "${merge(local.default_tags, var.alb_tags)}"
-
-  sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency"
-
-  alarm_action_config = "${var.rackspace_managed ? "managed":"unmanaged"}"
-
-  alarm_actions = {
-    managed = ["${local.sns_topic}"]
-
-    unmanaged = "${var.custom_alarm_sns_topic}"
-  }
-
-  ok_action_config = "${var.rackspace_managed ? "managed":"unmanaged"}"
-
-  ok_actions = {
-    managed = ["${local.sns_topic}"]
-
-    unmanaged = "${var.custom_ok_sns_topic}"
-  }
-
-  alarm_setting = "${local.alarm_actions[local.alarm_action_config]}"
-  ok_setting    = "${local.ok_actions[local.ok_action_config]}"
 }
 
 module "alb" {
@@ -181,28 +157,34 @@ resource "aws_route53_record" "zone_record_alias" {
 }
 
 # enable cloudwatch/RS ticket creation
-resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count_alarm" {
+data "null_data_source" "alarm_dimensions" {
   count = "${var.target_groups_count > 0 ? var.target_groups_count:0}"
 
-  alarm_name          = "${format("%v_unhealthy_host_count_alarm-%v", var.alb_name, lookup(var.target_groups[count.index], "name"))}"
-  alarm_description   = "Unhealthy Host count is greater than or equal to threshold, creating ticket."
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 10
-  metric_name         = "UnHealthyHostCount"
-  namespace           = "AWS/ApplicationELB"
-  period              = 60
-  statistic           = "Maximum"
-  threshold           = 1
-  unit                = "Count"
-
-  dimensions {
-    LoadBalancer = "${module.alb.load_balancer_arn_suffix}"
-    TargetGroup  = "${module.alb.target_group_arn_suffixes[count.index]}"
+  inputs = {
+    LoadBalancer = "${element(list(module.alb.load_balancer_arn_suffix), count.index)}"
+    TargetGroup  = "${element(module.alb.target_group_arn_suffixes, count.index)}"
   }
+}
 
-  alarm_actions = ["${local.alarm_setting}"]
+module "unhealthy_host_count_alarm" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
-  ok_actions = ["${local.ok_actions[local.ok_action_config]}"]
+  alarm_count              = "${var.target_groups_count > 0 ? var.target_groups_count:0}"
+  alarm_description        = "Unhealthy Host count is greater than or equal to threshold, creating ticket."
+  alarm_name               = "${var.alb_name}_unhealthy_host_count_alarm"
+  comparison_operator      = "GreaterThanOrEqualToThreshold"
+  dimensions               = "${data.null_data_source.alarm_dimensions.*.outputs}"
+  evaluation_periods       = 10
+  metric_name              = "UnHealthyHostCount"
+  namespace                = "AWS/ApplicationELB"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 60
+  rackspace_alarms_enabled = "${var.rackspace_alarms_enabled}"
+  rackspace_managed        = "${var.rackspace_managed}"
+  severity                 = "emergency"
+  statistic                = "Maximum"
+  threshold                = 1
+  unit                     = "Count"
 }
 
 # join ec2 instances to target group

@@ -139,22 +139,22 @@ variable "logging_bucket_retention" {
   default     = 14
 }
 
+variable "notification_topic" {
+  description = "List of SNS Topic ARNs to use for customer notifications."
+  type        = "list"
+  default     = []
+}
+
 variable "rackspace_managed" {
   description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
   type        = "string"
   default     = true
 }
 
-variable "custom_alarm_sns_topic" {
-  description = "If not using `rackspace_managed` set to a custom SNS topic ARN for alarms."
-  type        = "list"
-  default     = []
-}
-
-variable "custom_ok_sns_topic" {
-  description = "If not using `rackspace_managed` set to a custom SNS topic ARN for alarm clearance. Most likely the same as the alarm to clear the alarm."
-  type        = "list"
-  default     = []
+variable "rackspace_alarms_enabled" {
+  description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
+  type        = "string"
+  default     = false
 }
 
 variable "register_instance_targets_count" {
