@@ -96,6 +96,6 @@ output "logging_bucket_region" {
 #################
 
 output "unhealthy_host_alarm_id" {
-  value       = "${aws_cloudwatch_metric_alarm.unhealthy_host_count_alarm.*.id}"
+  value       = "${module.unhealthy_host_count_alarm.alarm_id}"
   description = "The ID of the health check."
 }

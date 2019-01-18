@@ -5,7 +5,7 @@ This module deploys an Application Load Balancer with associated resources, such
 
 ```
 module "alb" {
- source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.3"
+ source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.8"
 
  alb_name        = "MyALB"
  security_groups = ["${module.sg.public_web_security_group_id}"]
@@ -40,8 +40,6 @@ Full working references are available at [examples](examples)
 | alb\_tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | map | `<map>` | no |
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the ALB. i.e true | false | string | `"false"` | no |
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true | false | string | `"true"` | no |
-| custom\_alarm\_sns\_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarms. | list | `<list>` | no |
-| custom\_ok\_sns\_topic | If not using `rackspace_managed` set to a custom SNS topic ARN for alarm clearance. Most likely the same as the alarm to clear the alarm. | list | `<list>` | no |
 | enable\_deletion\_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | string | `"false"` | no |
 | enable\_http2 | If true sets HTTP/2 to enabled. | string | `"true"` | no |
 | environment | Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test') | string | `"Development"` | no |
@@ -61,6 +59,8 @@ Full working references are available at [examples](examples)
 | logging\_bucket\_name | The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name. | string | `""` | no |
 | logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | string | `""` | no |
 | logging\_bucket\_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | string | `"14"` | no |
+| notification\_topic | List of SNS Topic ARNs to use for customer notifications. | list | `<list>` | no |
+| rackspace\_alarms\_enabled | Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false. | string | `"false"` | no |
 | rackspace\_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | string | `"true"` | no |
 | register\_instance\_targets | List of Maps with the index of the target group and the instance id being registered with that group. i.e. [{'instance_id' : 'i-052f1856e2a471b74', 'target_group_index' : 0}, {'instance_id' : 'i-0cc4b566324707026', 'target_group_index' : 0}] | list | `<list>` | no |
 | register\_instance\_targets\_count | Count of ec2 instances being added to the target groups. | string | `"0"` | no |
