@@ -86,7 +86,8 @@ module "alb" {
     "LeftSaid"  = "George"
   }
 
-  http_listeners_count = 2
+  enable_https_redirect = true
+  http_listeners_count  = 2
 
   http_listeners = [
     {

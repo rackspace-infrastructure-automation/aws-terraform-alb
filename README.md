@@ -5,7 +5,7 @@ This module deploys an Application Load Balancer with associated resources, such
 
 ```
 module "alb" {
- source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.8"
+ source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
 
  alb_name        = "MyALB"
  security_groups = ["${module.sg.public_web_security_group_id}"]
@@ -42,6 +42,7 @@ Full working references are available at [examples](examples)
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true | false | string | `"true"` | no |
 | enable\_deletion\_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | string | `"false"` | no |
 | enable\_http2 | If true sets HTTP/2 to enabled. | string | `"true"` | no |
+| enable\_https\_redirect | If true and at least one HTTP and one HTTPS listener is created, HTTP listeners will have a redirect rule created to forward all traffic to the first HTTPS listener. | string | `"false"` | no |
 | environment | Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test') | string | `"Development"` | no |
 | extra\_ssl\_certs | A list of maps describing any extra SSL certificates to apply to the HTTPS listeners. Certificates must be in the same region as the ALB. Required key/values: certificate_arn, https_listener_index (the index of the listener within https_listeners which the cert applies toward). [{'certificate_arn', 'arn:aws:iam::123456789012:server-certificate/other_test_cert-123456789012', 'https_listener_index', 1}] | list | `<list>` | no |
 | extra\_ssl\_certs\_count | The number of extra ssl certs to be added. | string | `"0"` | no |

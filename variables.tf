@@ -33,6 +33,12 @@ variable "enable_http2" {
   default     = true
 }
 
+variable "enable_https_redirect" {
+  description = "If true and at least one HTTP and one HTTPS listener is created, HTTP listeners will have a redirect rule created to forward all traffic to the first HTTPS listener."
+  type        = "string"
+  default     = false
+}
+
 variable "environment" {
   description = "Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test')"
   type        = "string"
