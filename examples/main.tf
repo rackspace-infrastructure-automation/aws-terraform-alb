@@ -33,7 +33,7 @@ resource "aws_security_group" "test_sg" {
 }
 
 module "vpc" {
-  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.6"
+  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.9"
   az_count            = 2
   cidr_range          = "10.0.0.0/16"
   public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
@@ -42,7 +42,7 @@ module "vpc" {
 }
 
 module "alb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.8"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
 
   # Required
   alb_name        = "${random_string.rstring.result}-test-alb"

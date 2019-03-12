@@ -6,7 +6,7 @@
  *
  *```
  *module "alb" {
- *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.8"
+ *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
  *
  *  alb_name        = "MyALB"
  *  security_groups = ["${module.sg.public_web_security_group_id}"]
@@ -49,6 +49,8 @@ locals {
   }
 
   merged_tags = "${merge(local.default_tags, var.alb_tags)}"
+
+  enable_https_redirect = "${var.http_listeners_count > 0 && var.https_listeners_count > 0 && var.enable_https_redirect}"
 }
 
 module "alb" {
@@ -78,11 +80,32 @@ module "alb" {
   enable_deletion_protection = "${var.enable_deletion_protection}"
   load_balancer_is_internal  = "${var.load_balancer_is_internal}"
 
-  extra_ssl_certs_count = "${var.extra_ssl_certs_count}"
-  extra_ssl_certs       = "${var.extra_ssl_certs}"
-  idle_timeout          = "${var.idle_timeout}"
+  extra_ssl_certs_count       = "${var.extra_ssl_certs_count}"
+  extra_ssl_certs             = "${var.extra_ssl_certs}"
+  idle_timeout                = "${var.idle_timeout}"
+  listener_ssl_policy_default = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   tags = "${local.merged_tags}"
+}
+
+resource "aws_lb_listener_rule" "redirect_http_to_https" {
+  count        = "${local.enable_https_redirect ? var.http_listeners_count : 0}"
+  listener_arn = "${element(module.alb.http_tcp_listener_arns, count.index)}"
+
+  action {
+    type = "redirect"
+
+    redirect {
+      port        = "${lookup(var.https_listeners[0], "port")}"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["*"]
+  }
 }
 
 # create s3 bucket if needed
