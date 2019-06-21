@@ -67,7 +67,6 @@ module "alb" {
   logging_enabled          = "${var.create_logging_bucket || var.logging_bucket_name != "" ? true:false}"
   log_bucket_name          = "${var.create_logging_bucket ? element(concat(aws_s3_bucket_policy.log_bucket_policy.*.bucket, list("")), 0):var.logging_bucket_name}"
   log_location_prefix      = "${var.logging_bucket_prefix}"
-  tags                     = "${var.alb_tags}"
   http_tcp_listeners_count = "${var.http_listeners_count}"
   http_tcp_listeners       = "${var.http_listeners}"
   https_listeners_count    = "${var.https_listeners_count}"
