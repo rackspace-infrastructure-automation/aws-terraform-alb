@@ -55,7 +55,7 @@ locals {
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
-  version = "3.4.0"
+  version = "3.5.0"
 
   # Required values
   load_balancer_name = "${var.alb_name}"

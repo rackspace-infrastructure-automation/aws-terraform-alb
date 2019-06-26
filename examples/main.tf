@@ -42,7 +42,7 @@ module "vpc" {
 }
 
 module "alb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.11"
 
   # Required
   alb_name        = "${random_string.rstring.result}-test-alb"
@@ -76,11 +76,13 @@ module "alb" {
 
   target_groups_count = 2
 
+  # Slow start - https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#slow-start-mode
   target_groups = [
     {
       "name"             = "Test-TG1"
       "backend_protocol" = "HTTP"
       "backend_port"     = 80
+      "slow_start"       = 900
     },
     {
       "name"             = "Test-TG2"
