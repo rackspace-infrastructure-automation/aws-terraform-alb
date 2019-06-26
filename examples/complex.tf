@@ -47,7 +47,7 @@ module "vpc" {
 }
 
 module "alb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.10"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.11"
 
   # Required
   alb_name        = "${random_string.rstring.result}-test-alb"
