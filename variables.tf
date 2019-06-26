@@ -235,6 +235,8 @@ variable "target_groups_defaults" {
 
     "stickiness_enabled" = false
 
+    "slow_start" = 0
+
     "target_type" = "instance"
   }]
 }
