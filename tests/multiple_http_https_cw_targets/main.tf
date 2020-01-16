@@ -1,8 +1,12 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 # Test Target Group, Multiple HTTP, Single SSL, CloudWatch
 data "aws_availability_zones" "available" {}
 
 provider "aws" {
-  version = "~> 1.2"
+  version = "~> 2.0"
   region  = "us-west-2"
 }
 
@@ -15,7 +19,7 @@ resource "random_string" "rstring" {
 resource "aws_security_group" "test_sg" {
   name        = "${random_string.rstring.result}-test-sg-2"
   description = "Test SG Group"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 0
@@ -58,15 +62,15 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "test01" {
-  ami           = "${data.aws_ami.ubuntu.id}"
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  subnet_id     = "${module.vpc.public_subnets[0]}"
+  subnet_id     = module.vpc.public_subnets[0]
 }
 
 resource "aws_instance" "test02" {
-  ami           = "${data.aws_ami.ubuntu.id}"
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  subnet_id     = "${module.vpc.public_subnets[1]}"
+  subnet_id     = module.vpc.public_subnets[1]
 }
 
 module "alb" {
@@ -74,9 +78,9 @@ module "alb" {
 
   # Required
   alb_name        = "${random_string.rstring.result}-test-alb"
-  security_groups = "${list(aws_security_group.test_sg.id)}"
-  subnets         = "${module.vpc.public_subnets}"
-  vpc_id          = "${module.vpc.vpc_id}"
+  security_groups = [aws_security_group.test_sg.id]
+  subnets         = module.vpc.public_subnets
+  vpc_id          = module.vpc.vpc_id
 
   # Optional
   create_logging_bucket = false
@@ -119,20 +123,21 @@ module "alb" {
 
   register_instance_targets = [
     {
-      instance_id        = "${aws_instance.test01.id}"
+      instance_id        = aws_instance.test01.id
       target_group_index = 0
     },
     {
-      instance_id        = "${aws_instance.test02.id}"
+      instance_id        = aws_instance.test02.id
       target_group_index = 0
     },
   ]
 
-  target_groups = [{
-    "name" = "${random_string.rstring.result}-ALB-TargetGroup"
-
-    "backend_protocol" = "HTTP"
-
-    "backend_port" = 80
-  }]
+  target_groups = [
+    {
+      "name"             = "${random_string.rstring.result}-ALB-TargetGroup"
+      "backend_protocol" = "HTTP"
+      "backend_port"     = 80
+    },
+  ]
 }
+

@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 /*
 ALB with multiple listeners, target groups, and listener rules routing requests to a listener to different
 target groups based on path and host header.
@@ -7,7 +11,7 @@ target groups based on path and host header.
 data "aws_availability_zones" "available" {}
 
 provider "aws" {
-  version = "~> 1.2"
+  version = "~> 2.0"
   region  = "us-west-2"
 }
 
@@ -20,7 +24,7 @@ resource "random_string" "rstring" {
 resource "aws_security_group" "test_sg" {
   name        = "${random_string.rstring.result}-test-sg-1"
   description = "Test SG Group"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 0
@@ -51,10 +55,10 @@ module "alb" {
 
   # Required
   alb_name        = "${random_string.rstring.result}-test-alb"
-  security_groups = "${list(aws_security_group.test_sg.id)}"
-  subnets         = "${module.vpc.public_subnets}"
+  security_groups = [aws_security_group.test_sg.id]
+  subnets         = module.vpc.public_subnets
 
-  vpc_id = "${module.vpc.vpc_id}"
+  vpc_id = module.vpc.vpc_id
 
   # Optional
   create_logging_bucket = false
@@ -70,12 +74,12 @@ module "alb" {
 
   http_listeners_count = 2
 
-  http_listeners = [{
-    port = 80
-
-    protocol           = "HTTP"
-    target_group_index = 0
-  },
+  http_listeners = [
+    {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+    },
     {
       port               = 8080
       protocol           = "HTTP"
@@ -138,12 +142,12 @@ module "alb" {
 # Define rules
 # https://www.terraform.io/docs/providers/aws/r/lb_listener_rule.html
 resource "aws_lb_listener_rule" "host_based_routing" {
-  listener_arn = "${element(module.alb.http_tcp_listener_arns, 0)}"
+  listener_arn = element(module.alb.http_tcp_listener_arns, 0)
   priority     = 99
 
   action {
     type             = "forward"
-    target_group_arn = "${element(module.alb.target_group_arns, 0)}"
+    target_group_arn = element(module.alb.target_group_arns, 0)
   }
 
   condition {
@@ -153,12 +157,12 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 }
 
 resource "aws_lb_listener_rule" "path_based_routing" {
-  listener_arn = "${element(module.alb.https_listener_arns, 1)}"
+  listener_arn = element(module.alb.https_listener_arns, 1)
   priority     = 100
 
   action {
     type             = "forward"
-    target_group_arn = "${element(module.alb.target_group_arns, 3)}"
+    target_group_arn = element(module.alb.target_group_arns, 3)
   }
 
   condition {
@@ -166,3 +170,4 @@ resource "aws_lb_listener_rule" "path_based_routing" {
     values = ["/static/*"]
   }
 }
+

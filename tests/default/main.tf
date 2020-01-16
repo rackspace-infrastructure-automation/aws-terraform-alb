@@ -1,8 +1,12 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 # Minimum test with no optional vars
 data "aws_availability_zones" "available" {}
 
 provider "aws" {
-  version = "~> 1.2"
+  version = "~> 2.0"
   region  = "us-west-2"
 }
 
@@ -15,7 +19,7 @@ resource "random_string" "rstring" {
 resource "aws_security_group" "test_sg" {
   name        = "${random_string.rstring.result}-test-sg-0"
   description = "Test SG Group"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 0
@@ -45,9 +49,9 @@ module "alb" {
   source = "../../module"
 
   alb_name        = "${random_string.rstring.result}-test-alb"
-  security_groups = "${list(aws_security_group.test_sg.id)}"
-  subnets         = "${module.vpc.public_subnets}"
-  vpc_id          = "${module.vpc.vpc_id}"
+  security_groups = [aws_security_group.test_sg.id]
+  subnets         = module.vpc.public_subnets
+  vpc_id          = module.vpc.vpc_id
 
   create_logging_bucket = false
   http_listeners_count  = 0
@@ -55,3 +59,4 @@ module "alb" {
 
   rackspace_managed = true
 }
+

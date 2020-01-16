@@ -1,8 +1,12 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 # Test Internal Zone Creation and HTTP Listener
 data "aws_availability_zones" "available" {}
 
 provider "aws" {
-  version = "~> 1.2"
+  version = "~> 2.0"
   region  = "us-west-2"
 }
 
@@ -15,7 +19,7 @@ resource "random_string" "rstring" {
 resource "aws_security_group" "test_sg" {
   name        = "${random_string.rstring.result}-test-sg-1"
   description = "Test SG Group"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 0
@@ -46,10 +50,10 @@ module "alb" {
 
   # Required
   alb_name        = "${random_string.rstring.result}-test-alb"
-  security_groups = "${list(aws_security_group.test_sg.id)}"
-  subnets         = "${module.vpc.public_subnets}"
+  security_groups = [aws_security_group.test_sg.id]
+  subnets         = module.vpc.public_subnets
 
-  vpc_id = "${module.vpc.vpc_id}"
+  vpc_id = module.vpc.vpc_id
 
   # Optional
   create_logging_bucket = false
@@ -65,20 +69,22 @@ module "alb" {
 
   http_listeners_count = 1
 
-  http_listeners = [{
-    port = 80
-
-    protocol = "HTTP"
-  }]
+  http_listeners = [
+    {
+      port     = 80
+      protocol = "HTTP"
+    },
+  ]
 
   https_listeners_count = 0
   https_listeners       = []
 
-  target_groups = [{
-    "name" = "${random_string.rstring.result}-ALB-TargetGroup"
-
-    "backend_protocol" = "HTTP"
-
-    "backend_port" = 80
-  }]
+  target_groups = [
+    {
+      "name"             = "${random_string.rstring.result}-ALB-TargetGroup"
+      "backend_protocol" = "HTTP"
+      "backend_port"     = 80
+    },
+  ]
 }
+
