@@ -53,7 +53,7 @@ variable "extra_ssl_certs_count" {
 
 variable "extra_ssl_certs" {
   description = "A list of maps describing any extra SSL certificates to apply to the HTTPS listeners. Certificates must be in the same region as the ALB. Required key/values: certificate_arn, https_listener_index (the index of the listener within https_listeners which the cert applies toward). [{'certificate_arn', 'arn:aws:iam::123456789012:server-certificate/other_test_cert-123456789012', 'https_listener_index', 1}]"
-  type        = list(string)
+  type        = list(map(string))
   default     = []
 }
 
@@ -99,10 +99,28 @@ variable "internal_record_name" {
   default     = ""
 }
 
+variable "load_balancer_create_timeout" {
+  description = "Timeout value when creating the ALB."
+  type        = string
+  default     = "10m"
+}
+
+variable "load_balancer_delete_timeout" {
+  description = "Timeout value when deleting the ALB."
+  type        = string
+  default     = "10m"
+}
+
 variable "load_balancer_is_internal" {
   description = "Indicates whether the load balancer is Internet-facing or internal. i.e. true | false"
   type        = bool
   default     = false
+}
+
+variable "load_balancer_update_timeout" {
+  description = "Timeout value when updating the ALB."
+  type        = string
+  default     = "10m"
 }
 
 variable "logging_bucket_acl" {
@@ -138,7 +156,7 @@ variable "logging_bucket_name" {
 variable "logging_bucket_prefix" {
   description = "The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs'"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "logging_bucket_retention" {

@@ -4,7 +4,7 @@
  *
  *## Basic Usage
  *
- *```
+ *```HCL
  *module "alb" {
  *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
  *
@@ -59,48 +59,123 @@ locals {
   merged_tags = merge(local.default_tags, var.alb_tags)
 
   enable_https_redirect = var.http_listeners_count > 0 && var.https_listeners_count > 0 && var.enable_https_redirect
+
+  target_groups_defaults = var.target_groups_defaults[0]
+
+  log_bucket = element(concat(aws_s3_bucket_policy.log_bucket_policy.*.bucket, [var.logging_bucket_name]), 0)
+  access_logs = [
+    {
+      bucket  = local.log_bucket
+      enabled = local.log_bucket != "" && local.log_bucket != null
+      prefix  = var.logging_bucket_prefix
+    }
+  ]
 }
 
-module "alb" {
-  source  = "terraform-aws-modules/alb/aws"
-  version = "3.5.0"
-
-  # Required values
-  load_balancer_name = var.alb_name
-  security_groups    = var.security_groups
-  subnets            = var.subnets
-  vpc_id             = var.vpc_id
-
-  # Optional Values
-  logging_enabled = var.create_logging_bucket || var.logging_bucket_name != "" ? true : false
-  log_bucket_name = var.create_logging_bucket ? element(
-    concat(aws_s3_bucket_policy.log_bucket_policy.*.bucket, [""]),
-    0,
-  ) : var.logging_bucket_name
-  log_location_prefix      = var.logging_bucket_prefix
-  http_tcp_listeners_count = var.http_listeners_count
-  http_tcp_listeners       = var.http_listeners
-  https_listeners_count    = var.https_listeners_count
-  https_listeners          = var.https_listeners
-  target_groups_count      = var.target_groups_count
-  target_groups            = var.target_groups
-  target_groups_defaults   = var.target_groups_defaults
-  enable_http2             = var.enable_http2
-
+resource "aws_lb" "alb" {
   enable_deletion_protection = var.enable_deletion_protection
-  load_balancer_is_internal  = var.load_balancer_is_internal
+  enable_http2               = var.enable_http2
+  idle_timeout               = "${var.idle_timeout}"
+  internal                   = var.load_balancer_is_internal
+  ip_address_type            = "ipv4"
+  load_balancer_type         = "application"
+  name                       = var.alb_name
+  security_groups            = var.security_groups
+  subnets                    = var.subnets
+  tags                       = "${merge(local.merged_tags, map("Name", var.alb_name))}"
 
-  extra_ssl_certs_count       = var.extra_ssl_certs_count
-  extra_ssl_certs             = var.extra_ssl_certs
-  idle_timeout                = var.idle_timeout
-  listener_ssl_policy_default = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  dynamic "access_logs" {
+    for_each = [for al in local.access_logs : al if al.enabled]
 
-  tags = local.merged_tags
+    content {
+      bucket  = lookup(access_logs.value, "bucket", null)
+      enabled = lookup(access_logs.value, "enabled", lookup(access_logs.value, "bucket", null) != null)
+      prefix  = lookup(access_logs.value, "prefix", null)
+    }
+  }
+
+  timeouts {
+    create = "${var.load_balancer_create_timeout}"
+    delete = "${var.load_balancer_delete_timeout}"
+    update = "${var.load_balancer_update_timeout}"
+  }
+}
+
+resource "aws_lb_target_group" "main" {
+  count = var.target_groups_count
+
+  deregistration_delay = lookup(var.target_groups[count.index], "deregistration_delay", lookup(local.target_groups_defaults, "deregistration_delay"))
+  name                 = lookup(var.target_groups[count.index], "name")
+  port                 = lookup(var.target_groups[count.index], "backend_port")
+  protocol             = upper(lookup(var.target_groups[count.index], "backend_protocol"))
+  slow_start           = lookup(var.target_groups[count.index], "slow_start", lookup(local.target_groups_defaults, "slow_start"))
+  tags                 = merge(local.merged_tags, map("Name", lookup(var.target_groups[count.index], "name")))
+  target_type          = lookup(var.target_groups[count.index], "target_type", lookup(local.target_groups_defaults, "target_type"))
+  vpc_id               = var.vpc_id
+
+  health_check {
+    healthy_threshold   = lookup(var.target_groups[count.index], "health_check_healthy_threshold", lookup(local.target_groups_defaults, "health_check_healthy_threshold"))
+    interval            = lookup(var.target_groups[count.index], "health_check_interval", lookup(local.target_groups_defaults, "health_check_interval"))
+    matcher             = lookup(var.target_groups[count.index], "health_check_matcher", lookup(local.target_groups_defaults, "health_check_matcher"))
+    path                = lookup(var.target_groups[count.index], "health_check_path", lookup(local.target_groups_defaults, "health_check_path"))
+    port                = lookup(var.target_groups[count.index], "health_check_port", lookup(local.target_groups_defaults, "health_check_port"))
+    protocol            = upper(lookup(var.target_groups[count.index], "healthcheck_protocol", lookup(var.target_groups[count.index], "backend_protocol")))
+    timeout             = lookup(var.target_groups[count.index], "health_check_timeout", lookup(local.target_groups_defaults, "health_check_timeout"))
+    unhealthy_threshold = lookup(var.target_groups[count.index], "health_check_unhealthy_threshold", lookup(local.target_groups_defaults, "health_check_unhealthy_threshold"))
+  }
+
+  stickiness {
+    cookie_duration = lookup(var.target_groups[count.index], "cookie_duration", lookup(local.target_groups_defaults, "cookie_duration"))
+    enabled         = lookup(var.target_groups[count.index], "stickiness_enabled", lookup(local.target_groups_defaults, "stickiness_enabled"))
+    type            = "lb_cookie"
+  }
+
+  depends_on = [aws_lb.alb]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener" "http" {
+  count = var.http_listeners_count
+
+  load_balancer_arn = aws_lb.alb.arn
+  port              = lookup(var.http_listeners[count.index], "port")
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = element(aws_lb_target_group.main.*.id, lookup(var.http_listeners[count.index], "target_group_index", count.index))
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  count = var.https_listeners_count
+
+  certificate_arn   = lookup(var.https_listeners[count.index], "certificate_arn")
+  load_balancer_arn = aws_lb.alb.arn
+  port              = lookup(var.https_listeners[count.index], "port")
+  protocol          = "HTTPS"
+  ssl_policy        = lookup(var.https_listeners[count.index], "ssl_policy", "ELBSecurityPolicy-TLS-1-2-2017-01")
+
+  default_action {
+    target_group_arn = element(aws_lb_target_group.main.*.id, lookup(var.https_listeners[count.index], "target_group_index", count.index))
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener_certificate" "https" {
+  count = var.extra_ssl_certs_count
+
+  certificate_arn = lookup(var.extra_ssl_certs[count.index], "certificate_arn")
+  listener_arn    = element(aws_lb_listener.https.*.arn, lookup(var.extra_ssl_certs[count.index], "https_listener_index"))
 }
 
 resource "aws_lb_listener_rule" "redirect_http_to_https" {
-  count        = local.enable_https_redirect ? var.http_listeners_count : 0
-  listener_arn = element(module.alb.http_tcp_listener_arns, count.index)
+  count = local.enable_https_redirect ? var.http_listeners_count : 0
+
+  listener_arn = element(aws_lb_listener.http.*.arn, count.index)
 
   action {
     type = "redirect"
@@ -185,8 +260,8 @@ resource "aws_route53_record" "zone_record_alias" {
 
   alias {
     evaluate_target_health = true
-    name                   = module.alb.dns_name
-    zone_id                = module.alb.load_balancer_zone_id
+    name                   = aws_lb.alb.dns_name
+    zone_id                = aws_lb.alb.zone_id
   }
 }
 
@@ -195,13 +270,13 @@ data "null_data_source" "alarm_dimensions" {
   count = var.target_groups_count > 0 ? var.target_groups_count : 0
 
   inputs = {
-    LoadBalancer = element([module.alb.load_balancer_arn_suffix], count.index)
-    TargetGroup  = element(module.alb.target_group_arn_suffixes, count.index)
+    LoadBalancer = aws_lb.alb.arn_suffix
+    TargetGroup  = element(aws_lb_target_group.main.*.arn_suffix, count.index)
   }
 }
 
 module "unhealthy_host_count_alarm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.0"
 
   alarm_count              = var.target_groups_count > 0 ? var.target_groups_count : 0
   alarm_description        = "Unhealthy Host count is greater than or equal to threshold, creating ticket."
@@ -225,14 +300,13 @@ module "unhealthy_host_count_alarm" {
 resource "aws_lb_target_group_attachment" "target_group_instance" {
   count = var.register_instance_targets_count > 0 ? var.register_instance_targets_count : 0
 
-  # to match the instances to the
-  target_group_arn = module.alb.target_group_arns[var.register_instance_targets[count.index]["target_group_index"]]
+  target_group_arn = aws_lb_target_group.main.*.arn[var.register_instance_targets[count.index]["target_group_index"]]
   target_id        = var.register_instance_targets[count.index]["instance_id"]
 }
 
 resource "aws_wafregional_web_acl_association" "alb_waf" {
   count        = var.add_waf ? 1 : 0
-  resource_arn = module.alb.load_balancer_id
+  resource_arn = aws_lb.alb.id
   web_acl_id   = var.waf_id
 }
 
