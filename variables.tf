@@ -1,3 +1,9 @@
+variable "add_waf" {
+  description = "Add an existing Regional WAF to the ALB. true | false"
+  type        = bool
+  default     = false
+}
+
 variable "alb_name" {
   description = "A name for the load balancer, which must be unique within your AWS account."
   type        = string
@@ -57,12 +63,6 @@ variable "extra_ssl_certs" {
   default     = []
 }
 
-variable "http_listeners_count" {
-  description = "The number of HTTP listeners to be created."
-  type        = number
-  default     = 1
-}
-
 variable "http_listeners" {
   description = "List of Maps of HTTP listeners (port, protocol, target_group_index). i.e. [{'port', 80 , 'protocol', 'HTTP'}, {'port', 8080, 'protocol', 'HTTP'}]"
   type        = list(map(string))
@@ -75,16 +75,22 @@ variable "http_listeners" {
   ]
 }
 
-variable "https_listeners_count" {
-  description = "The number of HTTPS listeners to be created."
-  type        = string
-  default     = 0
+variable "http_listeners_count" {
+  description = "The number of HTTP listeners to be created."
+  type        = number
+  default     = 1
 }
 
 variable "https_listeners" {
   description = "List of Maps of HTTPS listeners. Certificate must be in the same region as the ALB. (port, certificate_arn, ssl_policy (optional: defaults to ELBSecurityPolicy-2016-08), target_group_index (optional: defaults to 0)) i.e. [{'certificate_arn', 'arn:aws:iam::123456789012:server-certificate/test_cert-123456789012', 'port', 443}]"
   type        = list(map(string))
   default     = []
+}
+
+variable "https_listeners_count" {
+  description = "The number of HTTPS listeners to be created."
+  type        = string
+  default     = 0
 }
 
 variable "idle_timeout" {
@@ -171,28 +177,28 @@ variable "notification_topic" {
   default     = []
 }
 
-variable "rackspace_managed" {
-  description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
-  type        = bool
-  default     = true
-}
-
 variable "rackspace_alarms_enabled" {
   description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
   type        = bool
   default     = false
 }
 
-variable "register_instance_targets_count" {
-  description = "Count of ec2 instances being added to the target groups."
-  type        = number
-  default     = 0
+variable "rackspace_managed" {
+  description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
+  type        = bool
+  default     = true
 }
 
 variable "register_instance_targets" {
   description = "List of Maps with the index of the target group and the instance id being registered with that group. i.e. [{'instance_id' : 'i-052f1856e2a471b74', 'target_group_index' : 0}, {'instance_id' : 'i-0cc4b566324707026', 'target_group_index' : 0}]"
   type        = list(map(string))
   default     = []
+}
+
+variable "register_instance_targets_count" {
+  description = "Count of ec2 instances being added to the target groups."
+  type        = number
+  default     = 0
 }
 
 variable "route_53_hosted_zone_id" {
@@ -211,12 +217,6 @@ variable "subnets" {
   type        = list(string)
 }
 
-variable "target_groups_count" {
-  description = "The number of target groups to create"
-  type        = number
-  default     = 1
-}
-
 variable "target_groups" {
   description = "A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target_groups_defaults variable. i.e. [{'name', 'foo', 'backend_protocol', 'HTTP', 'backend_port', '80'}]"
   type        = list(map(string))
@@ -228,6 +228,12 @@ variable "target_groups" {
       "backend_port"     = 80
     },
   ]
+}
+
+variable "target_groups_count" {
+  description = "The number of target groups to create"
+  type        = number
+  default     = 1
 }
 
 variable "target_groups_defaults" {
@@ -257,15 +263,8 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "add_waf" {
-  description = "Add an existing Regional WAF to the ALB. true | false"
-  type        = bool
-  default     = false
-}
-
 variable "waf_id" {
   description = "The unique identifier (ID) for the Regional Web Application Firewall (WAF) ACL. i.e. 329d10ec-e221-49d1-9f4b-e1294150d292"
   type        = string
   default     = ""
 }
-
