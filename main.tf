@@ -6,31 +6,68 @@
  *
  *```HCL
  *module "alb" {
- *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
- *
- *  alb_name        = "MyALB"
- *  security_groups = ["${module.sg.public_web_security_group_id}"]
- *  subnets         = ["${module.vpc.public_subnets}"]
- *  vpc_id          = "${module.vpc.vpc_id}"
+ *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
  *
  *  http_listeners_count = 1
+ *  name                 = "MyALB"
+ *  security_groups      = ["${module.sg.public_web_security_group_id}"]
+ *  subnets              = ["${module.vpc.public_subnets}"]
+ *  target_groups_count  = 1
+ *  vpc_id               = "${module.vpc.vpc_id}"
  *
  *  http_listeners = [{
  *    port     = 80
  *    protocol = "HTTP"
  *  }]
  *
- *  target_groups_count = 1
- *
  *  target_groups = [{
- *    "name"             = "MyTargetGroup"
- *    "backend_protocol" = "HTTP"
- *    "backend_port"     = 80
+ *    backend_port     = 80
+ *    backend_protocol = "HTTP"
+ *    name             = "MyTargetGroup"
  *  }]*
  *}
  *```
  *
  * Full working references are available at [examples](examples)
+ *
+ * ## Terraform 0.12 upgrade
+ *
+ * Several changes were required while adding terraform 0.12 compatibility.  The following changes should
+ * made when upgrading from a previous release to version 0.12.0 or higher.
+ *
+ *### Terraform State File
+ *
+ *During the conversion, we have removed dependency on upstream modules.  This does require some resources to be relocated 
+ *within the state file.  The following statements can be used to update existing resources.  In each command, `<MODULE_NAME>`
+ *should be replaced with the logic name used where the module is referenced.  One block applies to load balancers configured 
+ *with S3 logging, and the other for those with logging disabled
+ *
+ *#### ALBs configured with S3 logging
+ *
+ *```
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb.application module.<MODULE_NAME>.aws_lb.alb
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_target_group.main module.<MODULE_NAME>.aws_lb_target_group.main
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_http_tcp module.<MODULE_NAME>.aws_lb_listener.http
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_https module.<MODULE_NAME>.aws_lb_listener.https
+ *```
+ *
+ *#### ALBs configured with logging disabled
+ *
+ *```
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb.application_no_logs module.<MODULE_NAME>.aws_lb.alb
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_target_group.main_no_logs module.<MODULE_NAME>.aws_lb_target_group.main
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_http_tcp_no_logs module.<MODULE_NAME>.aws_lb_listener.http
+ * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_https_no_logs module.<MODULE_NAME>.aws_lb_listener.https
+ *```
+ *
+ * ### Module variables
+ *
+ * The following module variables were updated to better meet current Rackspace style guides:
+ *
+ * - `alb_name` -> `name`
+ * - `alb_tags` -> `tags`
+ * - `logging_bucket_encryption_kms_mster_key` -> `kms_key_id`
+ * - `route_53_hosted_zone_id` -> `internal_zone_id`
  *
  */
 
@@ -56,7 +93,7 @@ locals {
     Environment     = local.environment
   }
 
-  merged_tags = merge(local.default_tags, var.alb_tags)
+  merged_tags = merge(var.tags, local.default_tags)
 
   enable_https_redirect = var.http_listeners_count > 0 && var.https_listeners_count > 0 && var.enable_https_redirect
 
@@ -79,10 +116,10 @@ resource "aws_lb" "alb" {
   internal                   = var.load_balancer_is_internal
   ip_address_type            = "ipv4"
   load_balancer_type         = "application"
-  name                       = var.alb_name
+  name                       = var.name
   security_groups            = var.security_groups
   subnets                    = var.subnets
-  tags                       = merge(local.merged_tags, map("Name", var.alb_name))
+  tags                       = merge(local.merged_tags, map("Name", var.name))
 
   dynamic "access_logs" {
     for_each = [for al in local.access_logs : al if al.enabled]
@@ -215,7 +252,7 @@ resource "aws_s3_bucket" "log_bucket" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = var.logging_bucket_encryption_kms_mster_key
+        kms_master_key_id = var.kms_key_id
         sse_algorithm     = var.logging_bucket_encyption
       }
     }
@@ -252,7 +289,7 @@ resource "aws_route53_record" "zone_record_alias" {
 
   name    = var.internal_record_name
   type    = "A"
-  zone_id = var.route_53_hosted_zone_id
+  zone_id = var.internal_zone_id
 
   alias {
     evaluate_target_health = true
@@ -276,7 +313,7 @@ module "unhealthy_host_count_alarm" {
 
   alarm_count              = var.target_groups_count > 0 ? var.target_groups_count : 0
   alarm_description        = "Unhealthy Host count is greater than or equal to threshold, creating ticket."
-  alarm_name               = "${var.alb_name}_unhealthy_host_count_alarm"
+  alarm_name               = "${var.name}_unhealthy_host_count_alarm"
   comparison_operator      = "GreaterThanOrEqualToThreshold"
   dimensions               = data.null_data_source.alarm_dimensions.*.outputs
   evaluation_periods       = 10

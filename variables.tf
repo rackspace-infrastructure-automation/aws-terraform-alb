@@ -4,17 +4,6 @@ variable "add_waf" {
   default     = false
 }
 
-variable "alb_name" {
-  description = "A name for the load balancer, which must be unique within your AWS account."
-  type        = string
-}
-
-variable "alb_tags" {
-  description = "A map of tags to be applied to the ALB. i.e {Environment='Development'}"
-  type        = map(string)
-  default     = {}
-}
-
 variable "create_internal_zone_record" {
   description = "Create Route 53 internal zone record for the ALB. i.e true | false"
   type        = bool
@@ -105,6 +94,18 @@ variable "internal_record_name" {
   default     = ""
 }
 
+variable "internal_zone_id" {
+  description = "The Route53 Internal Hosted Zone ID."
+  type        = string
+  default     = ""
+}
+
+variable "kms_key_id" {
+  description = "The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse_algorithm as aws:kms."
+  type        = string
+  default     = ""
+}
+
 variable "load_balancer_create_timeout" {
   description = "Timeout value when creating the ALB."
   type        = string
@@ -141,12 +142,6 @@ variable "logging_bucket_encyption" {
   default     = "AES256"
 }
 
-variable "logging_bucket_encryption_kms_mster_key" {
-  description = "The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse_algorithm as aws:kms."
-  type        = string
-  default     = ""
-}
-
 variable "logging_bucket_force_destroy" {
   description = "Whether all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. ie. true | false"
   type        = bool
@@ -169,6 +164,11 @@ variable "logging_bucket_retention" {
   description = "The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999"
   type        = number
   default     = 14
+}
+
+variable "name" {
+  description = "A name for the load balancer, which must be unique within your AWS account."
+  type        = string
 }
 
 variable "notification_topic" {
@@ -201,12 +201,6 @@ variable "register_instance_targets_count" {
   default     = 0
 }
 
-variable "route_53_hosted_zone_id" {
-  description = "The Route53 Internal Hosted Zone ID."
-  type        = string
-  default     = ""
-}
-
 variable "security_groups" {
   description = "A list of EC2 security group ids to assign to this resource. i.e. ['sg-edcd9784', 'sg-edcd9785']"
   type        = list(string)
@@ -215,6 +209,12 @@ variable "security_groups" {
 variable "subnets" {
   description = "A list of at least two IDs of the subnets to associate with the load balancer. i.e ['subnet-abcde012', 'subnet-bcde012a']"
   type        = list(string)
+}
+
+variable "tags" {
+  description = "A map of tags to be applied to the ALB. i.e {Environment='Development'}"
+  type        = map(string)
+  default     = {}
 }
 
 variable "target_groups" {
