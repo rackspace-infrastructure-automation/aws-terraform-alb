@@ -23,7 +23,7 @@ module "alb" {
    backend_port     = 80
    backend_protocol = "HTTP"
    name             = "MyTargetGroup"
- }]*
+ }]
 }
 ```
 
