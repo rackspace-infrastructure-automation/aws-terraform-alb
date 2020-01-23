@@ -75,14 +75,14 @@ locals {
 resource "aws_lb" "alb" {
   enable_deletion_protection = var.enable_deletion_protection
   enable_http2               = var.enable_http2
-  idle_timeout               = "${var.idle_timeout}"
+  idle_timeout               = var.idle_timeout
   internal                   = var.load_balancer_is_internal
   ip_address_type            = "ipv4"
   load_balancer_type         = "application"
   name                       = var.alb_name
   security_groups            = var.security_groups
   subnets                    = var.subnets
-  tags                       = "${merge(local.merged_tags, map("Name", var.alb_name))}"
+  tags                       = merge(local.merged_tags, map("Name", var.alb_name))
 
   dynamic "access_logs" {
     for_each = [for al in local.access_logs : al if al.enabled]
@@ -95,9 +95,9 @@ resource "aws_lb" "alb" {
   }
 
   timeouts {
-    create = "${var.load_balancer_create_timeout}"
-    delete = "${var.load_balancer_delete_timeout}"
-    update = "${var.load_balancer_update_timeout}"
+    create = var.load_balancer_create_timeout
+    delete = var.load_balancer_delete_timeout
+    update = var.load_balancer_update_timeout
   }
 }
 
@@ -188,29 +188,20 @@ resource "aws_lb_listener_rule" "redirect_http_to_https" {
   }
 
   condition {
-    field  = "path-pattern"
-    values = ["*"]
+    path_pattern {
+      values = ["*"]
+    }
   }
 }
 
 # create s3 bucket if needed
 resource "aws_s3_bucket" "log_bucket" {
-  count  = var.create_logging_bucket ? 1 : 0
-  bucket = var.logging_bucket_name
-  acl    = local.bucket_acl
+  count = var.create_logging_bucket ? 1 : 0
 
+  acl           = local.bucket_acl
+  bucket        = var.logging_bucket_name
   force_destroy = var.logging_bucket_force_destroy
-
-  tags = local.merged_tags
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        kms_master_key_id = var.logging_bucket_encryption_kms_mster_key
-        sse_algorithm     = var.logging_bucket_encyption
-      }
-    }
-  }
+  tags          = local.merged_tags
 
   lifecycle_rule {
     enabled = true
@@ -220,40 +211,45 @@ resource "aws_s3_bucket" "log_bucket" {
       days = var.logging_bucket_retention
     }
   }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        kms_master_key_id = var.logging_bucket_encryption_kms_mster_key
+        sse_algorithm     = var.logging_bucket_encyption
+      }
+    }
+  }
 }
 
 # s3 policy needs to be separate since you can't reference the bucket for the reference.
-resource "aws_s3_bucket_policy" "log_bucket_policy" {
-  count  = var.create_logging_bucket ? 1 : 0
-  bucket = aws_s3_bucket.log_bucket[0].id
 
-  policy = <<POLICY
-{
-  "Id": "Policy1529427095432",
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "Stmt1529427092463",
-      "Action": [
-        "s3:PutObject"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.log_bucket[0].arn}/*",
-      "Principal": {
-        "AWS": [
-          "${data.aws_elb_service_account.main.arn}"
-        ]
-      }
+data "aws_iam_policy_document" "log_bucket_policy" {
+  count = var.create_logging_bucket ? 1 : 0
+
+  statement {
+    actions   = ["s3:PutObject"]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.log_bucket[0].arn}/*"]
+
+    principals {
+      identifiers = [data.aws_elb_service_account.main.arn]
+      type        = "AWS"
     }
-  ]
+  }
 }
-POLICY
 
+resource "aws_s3_bucket_policy" "log_bucket_policy" {
+  count = var.create_logging_bucket ? 1 : 0
+
+  bucket = aws_s3_bucket.log_bucket[0].id
+  policy = data.aws_iam_policy_document.log_bucket_policy[0].json
 }
 
 # create r53 record with alias
 resource "aws_route53_record" "zone_record_alias" {
-  count   = var.create_internal_zone_record ? 1 : 0
+  count = var.create_internal_zone_record ? 1 : 0
+
   name    = var.internal_record_name
   type    = "A"
   zone_id = var.route_53_hosted_zone_id
@@ -305,7 +301,8 @@ resource "aws_lb_target_group_attachment" "target_group_instance" {
 }
 
 resource "aws_wafregional_web_acl_association" "alb_waf" {
-  count        = var.add_waf ? 1 : 0
+  count = var.add_waf ? 1 : 0
+
   resource_arn = aws_lb.alb.id
   web_acl_id   = var.waf_id
 }

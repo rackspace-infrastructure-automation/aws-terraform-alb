@@ -3,7 +3,7 @@ This module deploys an Application Load Balancer with associated resources, such
 
 ## Basic Usage
 
-```
+```HCL
 module "alb" {
  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
 
