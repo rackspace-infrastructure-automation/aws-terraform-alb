@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 /*
 ALB with multiple listeners, target groups, and listener rules routing requests to a listener to different
 target groups based on path and host header.
@@ -7,83 +11,73 @@ target groups based on path and host header.
 data "aws_availability_zones" "available" {}
 
 provider "aws" {
-  version = "~> 1.2"
+  version = "~> 2.0"
   region  = "us-west-2"
 }
 
 resource "random_string" "rstring" {
   length  = 8
-  upper   = false
   special = false
+  upper   = false
 }
 
 resource "aws_security_group" "test_sg" {
-  name        = "${random_string.rstring.result}-test-sg-1"
   description = "Test SG Group"
-  vpc_id      = "${module.vpc.vpc_id}"
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  name        = "${random_string.rstring.result}-test-sg-1"
+  vpc_id      = module.vpc.vpc_id
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
+  }
+
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
   }
 }
 
 module "vpc" {
-  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.9"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
+
   az_count            = 2
   cidr_range          = "10.0.0.0/16"
-  public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
+  name                = "${random_string.rstring.result}-test"
   private_cidr_ranges = ["10.0.2.0/24", "10.0.4.0/24"]
-  vpc_name            = "${random_string.rstring.result}-test"
+  public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
 }
 
 module "alb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.11"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
 
-  # Required
-  alb_name        = "${random_string.rstring.result}-test-alb"
-  security_groups = "${list(aws_security_group.test_sg.id)}"
-  subnets         = "${module.vpc.public_subnets}"
-
-  vpc_id = "${module.vpc.vpc_id}"
-
-  # Optional
-  create_logging_bucket = false
-
+  name                        = "${random_string.rstring.result}-test-alb"
   create_internal_zone_record = true
+  create_logging_bucket       = false
+  http_listeners_count        = 2
+  https_listeners_count       = 2
   internal_record_name        = "alb.mupo181ve1jco37.net"
-  route_53_hosted_zone_id     = "Z34VQ0W1VUIFLH"
+  internal_zone_id            = "Z34VQ0W1VUIFLH"
+  security_groups             = [aws_security_group.test_sg.id]
+  subnets                     = module.vpc.public_subnets
+  target_groups_count         = 4
+  vpc_id                      = module.vpc.vpc_id
 
-  alb_tags = {
-    "RightSaid" = "Fred"
-    "LeftSaid"  = "George"
-  }
-
-  http_listeners_count = 2
-
-  http_listeners = [{
-    port = 80
-
-    protocol           = "HTTP"
-    target_group_index = 0
-  },
+  http_listeners = [
+    {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+    },
     {
       port               = 8080
       protocol           = "HTTP"
       target_group_index = 1
     },
   ]
-
-  https_listeners_count = 2
 
   //  SSL Policies - https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
   https_listeners = [
@@ -101,36 +95,39 @@ module "alb" {
     },
   ]
 
-  target_groups_count = 4
+  tags = {
+    RightSaid = "Fred"
+    LeftSaid  = "George"
+  }
 
   target_groups = [
     {
-      "name"              = "ComplexTargetGroup0"
-      "backend_protocol"  = "HTTP"
-      "backend_port"      = 80
-      "health_check_path" = "/ui"
+      name              = "ComplexTargetGroup0"
+      backend_protocol  = "HTTP"
+      backend_port      = 80
+      health_check_path = "/ui"
     },
     {
-      "name"                             = "ComplexTargetGroup1"
-      "backend_protocol"                 = "HTTP"
-      "backend_port"                     = 8080
-      "health_check_matcher"             = "200-299"
-      "health_check_timeout"             = 4
-      "health_check_unhealthy_threshold" = 2
-      "stickiness_enabled"               = false
-      "health_check_path"                = "/new_ui"
+      name                             = "ComplexTargetGroup1"
+      backend_protocol                 = "HTTP"
+      backend_port                     = 8080
+      health_check_matcher             = "200-299"
+      health_check_timeout             = 4
+      health_check_unhealthy_threshold = 2
+      stickiness_enabled               = false
+      health_check_path                = "/new_ui"
     },
     {
-      "name"              = "ComplexTargetGroup2"
-      "backend_protocol"  = "HTTPS"
-      "backend_port"      = 443
-      "health_check_path" = "/admin"
+      name              = "ComplexTargetGroup2"
+      backend_protocol  = "HTTPS"
+      backend_port      = 443
+      health_check_path = "/admin"
     },
     {
-      "name"              = "ComplexTargetGroup3"
-      "backend_protocol"  = "HTTPS"
-      "backend_port"      = 8443
-      "health_check_path" = "/new_admin"
+      name              = "ComplexTargetGroup3"
+      backend_protocol  = "HTTPS"
+      backend_port      = 8443
+      health_check_path = "/new_admin"
     },
   ]
 }
@@ -138,31 +135,34 @@ module "alb" {
 # Define rules
 # https://www.terraform.io/docs/providers/aws/r/lb_listener_rule.html
 resource "aws_lb_listener_rule" "host_based_routing" {
-  listener_arn = "${element(module.alb.http_tcp_listener_arns, 0)}"
+  listener_arn = element(module.alb.http_tcp_listener_arns, 0)
   priority     = 99
 
   action {
+    target_group_arn = element(module.alb.target_group_arns, 0)
     type             = "forward"
-    target_group_arn = "${element(module.alb.target_group_arns, 0)}"
   }
 
   condition {
-    field  = "host-header"
-    values = ["my-service.*.terraform.io"]
+    host_header {
+      values = ["my-service.*.terraform.io"]
+    }
   }
 }
 
 resource "aws_lb_listener_rule" "path_based_routing" {
-  listener_arn = "${element(module.alb.https_listener_arns, 1)}"
+  listener_arn = element(module.alb.https_listener_arns, 1)
   priority     = 100
 
   action {
+    target_group_arn = element(module.alb.target_group_arns, 3)
     type             = "forward"
-    target_group_arn = "${element(module.alb.target_group_arns, 3)}"
   }
 
   condition {
-    field  = "path-pattern"
-    values = ["/static/*"]
+    path_pattern {
+      values = ["/static/*"]
+    }
   }
 }
+
