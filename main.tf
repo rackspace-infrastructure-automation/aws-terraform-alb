@@ -1,32 +1,32 @@
 /**
  * # aws-terraform-alb
- *This module deploys an Application Load Balancer with associated resources, such as an unhealthy host count CloudWatch alarm, S3 log bucket, and Route 53 internal zone record.
+ * This module deploys an Application Load Balancer with associated resources, such as an unhealthy host count CloudWatch alarm, S3 log bucket, and Route 53 internal zone record.
  *
- *## Basic Usage
+ * ## Basic Usage
  *
- *```HCL
- *module "alb" {
- *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
+ * ```HCL
+ * module "alb" {
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
  *
- *  http_listeners_count = 1
- *  name                 = "MyALB"
- *  security_groups      = ["${module.sg.public_web_security_group_id}"]
- *  subnets              = ["${module.vpc.public_subnets}"]
- *  target_groups_count  = 1
- *  vpc_id               = "${module.vpc.vpc_id}"
+ *   http_listeners_count = 1
+ *   name                 = "MyALB"
+ *   security_groups      = ["${module.sg.public_web_security_group_id}"]
+ *   subnets              = ["${module.vpc.public_subnets}"]
+ *   target_groups_count  = 1
+ *   vpc_id               = "${module.vpc.vpc_id}"
  *
- *  http_listeners = [{
- *    port     = 80
- *    protocol = "HTTP"
- *  }]
+ *   http_listeners = [{
+ *     port     = 80
+ *     protocol = "HTTP"
+ *   }]
  *
- *  target_groups = [{
- *    backend_port     = 80
- *    backend_protocol = "HTTP"
- *    name             = "MyTargetGroup"
- *  }]
- *}
- *```
+ *   target_groups = [{
+ *     backend_port     = 80
+ *     backend_protocol = "HTTP"
+ *     name             = "MyTargetGroup"
+ *   }]
+ * }
+ * ```
  *
  * Full working references are available at [examples](examples)
  *
@@ -35,30 +35,30 @@
  * Several changes were required while adding terraform 0.12 compatibility.  The following changes should
  * made when upgrading from a previous release to version 0.12.0 or higher.
  *
- *### Terraform State File
+ * ### Terraform State File
  *
- *During the conversion, we have removed dependency on upstream modules.  This does require some resources to be relocated 
- *within the state file.  The following statements can be used to update existing resources.  In each command, `<MODULE_NAME>`
- *should be replaced with the logic name used where the module is referenced.  One block applies to load balancers configured 
- *with S3 logging, and the other for those with logging disabled
+ * During the conversion, we have removed dependency on upstream modules.  This does require some resources to be relocated 
+ * within the state file.  The following statements can be used to update existing resources.  In each command, `<MODULE_NAME>`
+ * should be replaced with the logic name used where the module is referenced.  One block applies to load balancers configured 
+ * with S3 logging, and the other for those with logging disabled
  *
- *#### ALBs configured with S3 logging
+ * #### ALBs configured with S3 logging
  *
- *```
+ * ```
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb.application module.<MODULE_NAME>.aws_lb.alb
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_target_group.main module.<MODULE_NAME>.aws_lb_target_group.main
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_http_tcp module.<MODULE_NAME>.aws_lb_listener.http
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_https module.<MODULE_NAME>.aws_lb_listener.https
- *```
+ * ```
  *
- *#### ALBs configured with logging disabled
+ * #### ALBs configured with logging disabled
  *
- *```
+ * ```
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb.application_no_logs module.<MODULE_NAME>.aws_lb.alb
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_target_group.main_no_logs module.<MODULE_NAME>.aws_lb_target_group.main
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_http_tcp_no_logs module.<MODULE_NAME>.aws_lb_listener.http
  * terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_https_no_logs module.<MODULE_NAME>.aws_lb_listener.https
- *```
+ * ```
  *
  * ### Module variables
  *
