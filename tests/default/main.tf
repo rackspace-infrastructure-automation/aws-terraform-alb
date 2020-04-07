@@ -6,7 +6,7 @@ terraform {
 data "aws_availability_zones" "available" {}
 
 provider "aws" {
-  version = "~> 2.0"
+  version = "~> 2.7"
   region  = "us-west-2"
 }
 
