@@ -5,25 +5,25 @@ This module deploys an Application Load Balancer with associated resources, such
 
 ```HCL
 module "alb" {
- source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
 
- http_listeners_count = 1
- name                 = "MyALB"
- security_groups      = ["${module.sg.public_web_security_group_id}"]
- subnets              = ["${module.vpc.public_subnets}"]
- target_groups_count  = 1
- vpc_id               = "${module.vpc.vpc_id}"
+  http_listeners_count = 1
+  name                 = "MyALB"
+  security_groups      = ["${module.sg.public_web_security_group_id}"]
+  subnets              = ["${module.vpc.public_subnets}"]
+  target_groups_count  = 1
+  vpc_id               = "${module.vpc.vpc_id}"
 
- http_listeners = [{
-   port     = 80
-   protocol = "HTTP"
- }]
+  http_listeners = [{
+    port     = 80
+    protocol = "HTTP"
+  }]
 
- target_groups = [{
-   backend_port     = 80
-   backend_protocol = "HTTP"
-   name             = "MyTargetGroup"
- }]
+  target_groups = [{
+    backend_port     = 80
+    backend_protocol = "HTTP"
+    name             = "MyTargetGroup"
+  }]
 }
 ```
 
@@ -63,16 +63,16 @@ terraform state mv module.<MODULE_NAME>.module.alb.aws_lb_listener.frontend_http
 
 The following module variables were updated to better meet current Rackspace style guides:
 
-- `alb_name` -> `name`  
-- `alb_tags` -> `tags`  
-- `logging_bucket_encryption_kms_mster_key` -> `kms_key_id`  
+- `alb_name` -> `name`
+- `alb_tags` -> `tags`
+- `logging_bucket_encryption_kms_mster_key` -> `kms_key_id`
 - `route_53_hosted_zone_id` -> `internal_zone_id`
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 2.1.0 |
+| aws | >= 2.7.0 |
 | null | n/a |
 
 ## Inputs
@@ -88,7 +88,7 @@ The following module variables were updated to better meet current Rackspace sty
 | environment | Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test') | `string` | `"Development"` | no |
 | extra\_ssl\_certs | A list of maps describing any extra SSL certificates to apply to the HTTPS listeners. Certificates must be in the same region as the ALB. Required key/values: certificate\_arn, https\_listener\_index (the index of the listener within https\_listeners which the cert applies toward). [{'certificate\_arn', 'arn:aws:iam::123456789012:server-certificate/other\_test\_cert-123456789012', 'https\_listener\_index', 1}] | `list(map(string))` | `[]` | no |
 | extra\_ssl\_certs\_count | The number of extra ssl certs to be added. | `number` | `0` | no |
-| http\_listeners | List of Maps of HTTP listeners (port, protocol, target\_group\_index). i.e. [{'port', 80 , 'protocol', 'HTTP'}, {'port', 8080, 'protocol', 'HTTP'}] | `list(map(string))` | <pre>[<br>  {<br>    "port": 80,<br>    "protocol": "HTTP"<br>  }<br>]<br></pre> | no |
+| http\_listeners | List of Maps of HTTP listeners (port, protocol, target\_group\_index). i.e. [{'port', 80 , 'protocol', 'HTTP'}, {'port', 8080, 'protocol', 'HTTP'}] | `list(map(string))` | <pre>[<br>  {<br>    "port": 80,<br>    "protocol": "HTTP"<br>  }<br>]</pre> | no |
 | http\_listeners\_count | The number of HTTP listeners to be created. | `number` | `1` | no |
 | https\_listeners | List of Maps of HTTPS listeners. Certificate must be in the same region as the ALB. (port, certificate\_arn, ssl\_policy (optional: defaults to ELBSecurityPolicy-2016-08), target\_group\_index (optional: defaults to 0)) i.e. [{'certificate\_arn', 'arn:aws:iam::123456789012:server-certificate/test\_cert-123456789012', 'port', 443}] | `list(map(string))` | `[]` | no |
 | https\_listeners\_count | The number of HTTPS listeners to be created. | `string` | `0` | no |
@@ -115,9 +115,9 @@ The following module variables were updated to better meet current Rackspace sty
 | security\_groups | A list of EC2 security group ids to assign to this resource. i.e. ['sg-edcd9784', 'sg-edcd9785'] | `list(string)` | n/a | yes |
 | subnets | A list of at least two IDs of the subnets to associate with the load balancer. i.e ['subnet-abcde012', 'subnet-bcde012a'] | `list(string)` | n/a | yes |
 | tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | `map(string)` | `{}` | no |
-| target\_groups | A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target\_groups\_defaults variable. i.e. [{'name', 'foo', 'backend\_protocol', 'HTTP', 'backend\_port', '80'}] | `list(map(string))` | <pre>[<br>  {<br>    "backend_port": 80,<br>    "backend_protocol": "HTTP",<br>    "name": "ALB-TargetGroup"<br>  }<br>]<br></pre> | no |
+| target\_groups | A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target\_groups\_defaults variable. i.e. [{'name', 'foo', 'backend\_protocol', 'HTTP', 'backend\_port', '80'}] | `list(map(string))` | <pre>[<br>  {<br>    "backend_port": 80,<br>    "backend_protocol": "HTTP",<br>    "name": "ALB-TargetGroup"<br>  }<br>]</pre> | no |
 | target\_groups\_count | The number of target groups to create | `number` | `1` | no |
-| target\_groups\_defaults | Default values for target groups as defined by the list of maps. i.e. [{ 'cookie\_duration': 86400, 'deregistration\_delay': 300, 'health\_check\_healthy\_threshold': 3, 'health\_check\_interval': 10, 'health\_check\_matcher': '200-299', 'health\_check\_path': '/', 'health\_check\_port': 'traffic-port', 'health\_check\_timeout': 5, 'health\_check\_unhealthy\_threshold': 3, 'stickiness\_enabled': true, 'target\_type': 'instance' }] | `list(map(string))` | <pre>[<br>  {<br>    "cookie_duration": 86400,<br>    "deregistration_delay": 30,<br>    "health_check_healthy_threshold": 5,<br>    "health_check_interval": 30,<br>    "health_check_matcher": "200-299",<br>    "health_check_path": "/",<br>    "health_check_port": "traffic-port",<br>    "health_check_timeout": 5,<br>    "health_check_unhealthy_threshold": 2,<br>    "slow_start": 0,<br>    "stickiness_enabled": false,<br>    "target_type": "instance"<br>  }<br>]<br></pre> | no |
+| target\_groups\_defaults | Default values for target groups as defined by the list of maps. i.e. [{ 'cookie\_duration': 86400, 'deregistration\_delay': 300, 'health\_check\_healthy\_threshold': 3, 'health\_check\_interval': 10, 'health\_check\_matcher': '200-299', 'health\_check\_path': '/', 'health\_check\_port': 'traffic-port', 'health\_check\_timeout': 5, 'health\_check\_unhealthy\_threshold': 3, 'stickiness\_enabled': true, 'target\_type': 'instance' }] | `list(map(string))` | <pre>[<br>  {<br>    "cookie_duration": 86400,<br>    "deregistration_delay": 30,<br>    "health_check_healthy_threshold": 5,<br>    "health_check_interval": 30,<br>    "health_check_matcher": "200-299",<br>    "health_check_path": "/",<br>    "health_check_port": "traffic-port",<br>    "health_check_timeout": 5,<br>    "health_check_unhealthy_threshold": 2,<br>    "slow_start": 0,<br>    "stickiness_enabled": false,<br>    "target_type": "instance"<br>  }<br>]</pre> | no |
 | vpc\_id | The VPC in which your targets are located. i.e. vpc-abcde012 | `string` | n/a | yes |
 | waf\_id | The unique identifier (ID) for the Regional Web Application Firewall (WAF) ACL. i.e. 329d10ec-e221-49d1-9f4b-e1294150d292 | `string` | `""` | no |
 
