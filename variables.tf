@@ -166,6 +166,12 @@ variable "logging_bucket_retention" {
   default     = 14
 }
 
+variable "logging_enabled" {
+  description = "Whether logging for this bucket is enabled."
+  type        = bool
+  default     = false
+}
+
 variable "name" {
   description = "A name for the load balancer, which must be unique within your AWS account."
   type        = string

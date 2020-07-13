@@ -6,7 +6,7 @@
  *
  * ```HCL
  * module "alb" {
- *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.3"
  *
  *   http_listeners_count = 1
  *   name                 = "MyALB"
@@ -102,7 +102,7 @@ locals {
   access_logs = [
     {
       bucket  = var.logging_bucket_name
-      enabled = var.logging_bucket_name != "" && var.logging_bucket_name != null
+      enabled = var.logging_enabled
       prefix  = var.logging_bucket_prefix
     }
   ]
@@ -124,9 +124,9 @@ resource "aws_lb" "alb" {
     for_each = [for al in local.access_logs : al if al.enabled]
 
     content {
-      bucket  = lookup(access_logs.value, "bucket", null)
-      enabled = lookup(access_logs.value, "enabled", null)
-      prefix  = lookup(access_logs.value, "prefix", null)
+      bucket  = access_logs.value["bucket"]
+      enabled = access_logs.value["enabled"]
+      prefix  = access_logs.value["prefix"]
     }
   }
 
