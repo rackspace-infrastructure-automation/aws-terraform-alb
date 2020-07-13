@@ -39,11 +39,19 @@ resource "aws_security_group" "test_sg" {
 module "vpc" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=master"
 
-  az_count            = 2
-  cidr_range          = "10.0.0.0/16"
-  name                = "${random_string.rstring.result}-test"
-  private_cidr_ranges = ["10.0.2.0/24", "10.0.4.0/24"]
-  public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
+  az_count   = 2
+  cidr_range = "10.0.0.0/16"
+  name       = "${random_string.rstring.result}-test"
+
+  private_cidr_ranges = [
+    "10.0.2.0/24",
+    "10.0.4.0/24",
+  ]
+
+  public_cidr_ranges = [
+    "10.0.1.0/24",
+    "10.0.3.0/24",
+  ]
 }
 
 module "alb" {
@@ -58,4 +66,3 @@ module "alb" {
   target_groups_count   = 0
   vpc_id                = module.vpc.vpc_id
 }
-
