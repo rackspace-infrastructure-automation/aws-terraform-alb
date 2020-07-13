@@ -37,9 +37,9 @@
  *
  * ### Terraform State File
  *
- * During the conversion, we have removed dependency on upstream modules.  This does require some resources to be relocated 
+ * During the conversion, we have removed dependency on upstream modules.  This does require some resources to be relocated
  * within the state file.  The following statements can be used to update existing resources.  In each command, `<MODULE_NAME>`
- * should be replaced with the logic name used where the module is referenced.  One block applies to load balancers configured 
+ * should be replaced with the logic name used where the module is referenced.  One block applies to load balancers configured
  * with S3 logging, and the other for those with logging disabled
  *
  * #### ALBs configured with S3 logging
@@ -99,11 +99,10 @@ locals {
 
   target_groups_defaults = var.target_groups_defaults[0]
 
-  log_bucket = element(concat(aws_s3_bucket_policy.log_bucket_policy.*.bucket, [var.logging_bucket_name]), 0)
   access_logs = [
     {
-      bucket  = local.log_bucket
-      enabled = local.log_bucket != "" && local.log_bucket != null
+      bucket  = var.logging_bucket_name
+      enabled = var.logging_bucket_name != "" && var.logging_bucket_name != null
       prefix  = var.logging_bucket_prefix
     }
   ]
@@ -126,7 +125,7 @@ resource "aws_lb" "alb" {
 
     content {
       bucket  = lookup(access_logs.value, "bucket", null)
-      enabled = lookup(access_logs.value, "enabled", lookup(access_logs.value, "bucket", null) != null)
+      enabled = lookup(access_logs.value, "enabled", null)
       prefix  = lookup(access_logs.value, "prefix", null)
     }
   }
@@ -136,6 +135,10 @@ resource "aws_lb" "alb" {
     delete = var.load_balancer_delete_timeout
     update = var.load_balancer_update_timeout
   }
+
+  depends_on = [
+    aws_s3_bucket_policy.log_bucket_policy,
+  ]
 }
 
 resource "aws_lb_target_group" "main" {
@@ -343,4 +346,3 @@ resource "aws_wafregional_web_acl_association" "alb_waf" {
   resource_arn = aws_lb.alb.id
   web_acl_id   = var.waf_id
 }
-
