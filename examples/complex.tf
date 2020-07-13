@@ -42,17 +42,25 @@ resource "aws_security_group" "test_sg" {
 }
 
 module "vpc" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.3"
 
-  az_count            = 2
-  cidr_range          = "10.0.0.0/16"
-  name                = "${random_string.rstring.result}-test"
-  private_cidr_ranges = ["10.0.2.0/24", "10.0.4.0/24"]
-  public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
+  az_count   = 2
+  cidr_range = "10.0.0.0/16"
+  name       = "${random_string.rstring.result}-test"
+
+  private_cidr_ranges = [
+    "10.0.2.0/24",
+    "10.0.4.0/24",
+  ]
+
+  public_cidr_ranges = [
+    "10.0.1.0/24",
+    "10.0.3.0/24",
+  ]
 }
 
 module "alb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.3"
 
   name                        = "${random_string.rstring.result}-test-alb"
   create_internal_zone_record = true
@@ -165,4 +173,3 @@ resource "aws_lb_listener_rule" "path_based_routing" {
     }
   }
 }
-

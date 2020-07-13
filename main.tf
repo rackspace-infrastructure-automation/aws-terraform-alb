@@ -6,7 +6,7 @@
  *
  * ```HCL
  * module "alb" {
- *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.0"
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.3"
  *
  *   http_listeners_count = 1
  *   name                 = "MyALB"
@@ -15,16 +15,20 @@
  *   target_groups_count  = 1
  *   vpc_id               = "${module.vpc.vpc_id}"
  *
- *   http_listeners = [{
- *     port     = 80
- *     protocol = "HTTP"
- *   }]
+ *   http_listeners = [
+ *     {
+ *       port     = 80
+ *       protocol = "HTTP"
+ *     },
+ *   ]
  *
- *   target_groups = [{
- *     backend_port     = 80
- *     backend_protocol = "HTTP"
- *     name             = "MyTargetGroup"
- *   }]
+ *   target_groups = [
+ *     {
+ *       backend_port     = 80
+ *       backend_protocol = "HTTP"
+ *       name             = "MyTargetGroup"
+ *     }
+ *   ]
  * }
  * ```
  *
@@ -37,9 +41,9 @@
  *
  * ### Terraform State File
  *
- * During the conversion, we have removed dependency on upstream modules.  This does require some resources to be relocated 
+ * During the conversion, we have removed dependency on upstream modules.  This does require some resources to be relocated
  * within the state file.  The following statements can be used to update existing resources.  In each command, `<MODULE_NAME>`
- * should be replaced with the logic name used where the module is referenced.  One block applies to load balancers configured 
+ * should be replaced with the logic name used where the module is referenced.  One block applies to load balancers configured
  * with S3 logging, and the other for those with logging disabled
  *
  * #### ALBs configured with S3 logging
@@ -82,15 +86,13 @@ terraform {
 data "aws_elb_service_account" "main" {}
 
 locals {
-  env_list = ["Development", "Integration", "PreProduction", "Production", "QA", "Staging", "Test"]
   acl_list = ["authenticated-read", "aws-exec-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write", "private", "public-read", "public-read-write"]
 
-  bucket_acl  = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
-  environment = contains(local.env_list, var.environment) ? var.environment : "Development"
+  bucket_acl = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
 
   default_tags = {
     ServiceProvider = "Rackspace"
-    Environment     = local.environment
+    Environment     = var.environment
   }
 
   merged_tags = merge(var.tags, local.default_tags)
@@ -99,11 +101,10 @@ locals {
 
   target_groups_defaults = var.target_groups_defaults[0]
 
-  log_bucket = element(concat(aws_s3_bucket_policy.log_bucket_policy.*.bucket, [var.logging_bucket_name]), 0)
   access_logs = [
     {
-      bucket  = local.log_bucket
-      enabled = local.log_bucket != "" && local.log_bucket != null
+      bucket  = var.logging_bucket_name
+      enabled = var.logging_enabled
       prefix  = var.logging_bucket_prefix
     }
   ]
@@ -125,9 +126,9 @@ resource "aws_lb" "alb" {
     for_each = [for al in local.access_logs : al if al.enabled]
 
     content {
-      bucket  = lookup(access_logs.value, "bucket", null)
-      enabled = lookup(access_logs.value, "enabled", lookup(access_logs.value, "bucket", null) != null)
-      prefix  = lookup(access_logs.value, "prefix", null)
+      bucket  = access_logs.value["bucket"]
+      enabled = access_logs.value["enabled"]
+      prefix  = access_logs.value["prefix"]
     }
   }
 
@@ -136,6 +137,10 @@ resource "aws_lb" "alb" {
     delete = var.load_balancer_delete_timeout
     update = var.load_balancer_update_timeout
   }
+
+  depends_on = [
+    aws_s3_bucket_policy.log_bucket_policy,
+  ]
 }
 
 resource "aws_lb_target_group" "main" {
@@ -343,4 +348,3 @@ resource "aws_wafregional_web_acl_association" "alb_waf" {
   resource_arn = aws_lb.alb.id
   web_acl_id   = var.waf_id
 }
-
