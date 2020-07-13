@@ -82,15 +82,13 @@ terraform {
 data "aws_elb_service_account" "main" {}
 
 locals {
-  env_list = ["Development", "Integration", "PreProduction", "Production", "QA", "Staging", "Test"]
   acl_list = ["authenticated-read", "aws-exec-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write", "private", "public-read", "public-read-write"]
 
   bucket_acl  = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
-  environment = contains(local.env_list, var.environment) ? var.environment : "Development"
 
   default_tags = {
     ServiceProvider = "Rackspace"
-    Environment     = local.environment
+    Environment     = var.environment
   }
 
   merged_tags = merge(var.tags, local.default_tags)
