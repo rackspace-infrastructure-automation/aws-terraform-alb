@@ -15,16 +15,20 @@
  *   target_groups_count  = 1
  *   vpc_id               = "${module.vpc.vpc_id}"
  *
- *   http_listeners = [{
- *     port     = 80
- *     protocol = "HTTP"
- *   }]
+ *   http_listeners = [
+ *     {
+ *       port     = 80
+ *       protocol = "HTTP"
+ *     },
+ *   ]
  *
- *   target_groups = [{
- *     backend_port     = 80
- *     backend_protocol = "HTTP"
- *     name             = "MyTargetGroup"
- *   }]
+ *   target_groups = [
+ *     {
+ *       backend_port     = 80
+ *       backend_protocol = "HTTP"
+ *       name             = "MyTargetGroup"
+ *     }
+ *   ]
  * }
  * ```
  *
@@ -84,7 +88,7 @@ data "aws_elb_service_account" "main" {}
 locals {
   acl_list = ["authenticated-read", "aws-exec-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write", "private", "public-read", "public-read-write"]
 
-  bucket_acl  = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
+  bucket_acl = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
 
   default_tags = {
     ServiceProvider = "Rackspace"
