@@ -37,7 +37,7 @@ resource "aws_security_group" "test_sg" {
 }
 
 module "vpc" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.3"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.2"
 
   az_count   = 2
   cidr_range = "10.0.0.0/16"
