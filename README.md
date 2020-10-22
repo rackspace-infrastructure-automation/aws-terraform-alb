@@ -5,7 +5,7 @@ This module deploys an Application Load Balancer with associated resources, such
 
 ```HCL
 module "alb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.3"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.5"
 
   http_listeners_count = 1
   name                 = "MyALB"

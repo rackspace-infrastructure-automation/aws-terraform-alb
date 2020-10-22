@@ -6,7 +6,7 @@
  *
  * ```HCL
  * module "alb" {
- *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.3"
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.12.5"
  *
  *   http_listeners_count = 1
  *   name                 = "MyALB"
@@ -252,6 +252,14 @@ resource "aws_s3_bucket" "log_bucket" {
     expiration {
       days = var.logging_bucket_retention
     }
+  }
+
+  lifecycle_rule {
+    abort_incomplete_multipart_upload_days = 7
+    enabled                                = true
+    id                                     = "rax-cleanup-incomplete-mpu-objects"
+
+    expiration {}
   }
 
   server_side_encryption_configuration {
