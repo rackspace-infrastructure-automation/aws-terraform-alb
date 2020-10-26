@@ -137,7 +137,7 @@ resource "aws_s3_bucket" "log_bucket" {
 
   lifecycle_rule {
     abort_incomplete_multipart_upload_days = 7
-    enabled                                = false
+    enabled                                = true
     id                                     = "rax-cleanup-incomplete-mpu-objects"
     expiration                             = [{}]
   }
