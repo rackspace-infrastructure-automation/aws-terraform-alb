@@ -1,34 +1,34 @@
 /**
  * # aws-terraform-alb
- *This module deploys an Application Load Balancer with associated resources, such as an unhealthy host count CloudWatch alarm, S3 log bucket, and Route 53 internal zone record.
+ * This module deploys an Application Load Balancer with associated resources, such as an unhealthy host count CloudWatch alarm, S3 log bucket, and Route 53 internal zone record.
  *
- *## Basic Usage
+ * ## Basic Usage
  *
- *```
- *module "alb" {
- *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.9"
+ * ```
+ * module "alb" {
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-alb//?ref=v0.0.12"
  *
- *  alb_name        = "MyALB"
- *  security_groups = ["${module.sg.public_web_security_group_id}"]
- *  subnets         = ["${module.vpc.public_subnets}"]
- *  vpc_id          = "${module.vpc.vpc_id}"
+ *   alb_name        = "MyALB"
+ *   security_groups = ["${module.sg.public_web_security_group_id}"]
+ *   subnets         = ["${module.vpc.public_subnets}"]
+ *   vpc_id          = "${module.vpc.vpc_id}"
  *
- *  http_listeners_count = 1
+ *   http_listeners_count = 1
  *
- *  http_listeners = [{
- *    port     = 80
- *    protocol = "HTTP"
- *  }]
+ *   http_listeners = [{
+ *     port     = 80
+ *     protocol = "HTTP"
+ *   }]
  *
- *  target_groups_count = 1
+ *   target_groups_count = 1
  *
- *  target_groups = [{
- *    "name"             = "MyTargetGroup"
- *    "backend_protocol" = "HTTP"
- *    "backend_port"     = 80
- *  }]*
- *}
- *```
+ *   target_groups = [{
+ *     "name"             = "MyTargetGroup"
+ *     "backend_protocol" = "HTTP"
+ *     "backend_port"     = 80
+ *   }]*
+ * }
+ * ```
  *
  * Full working references are available at [examples](examples)
  *
@@ -118,8 +118,8 @@ resource "aws_s3_bucket" "log_bucket" {
   tags = "${local.merged_tags}"
 
   server_side_encryption_configuration {
-    "rule" {
-      "apply_server_side_encryption_by_default" {
+    rule {
+      apply_server_side_encryption_by_default {
         kms_master_key_id = "${var.logging_bucket_encryption_kms_mster_key}"
         sse_algorithm     = "${var.logging_bucket_encyption}"
       }
@@ -133,6 +133,13 @@ resource "aws_s3_bucket" "log_bucket" {
     expiration {
       days = "${var.logging_bucket_retention}"
     }
+  }
+
+  lifecycle_rule {
+    abort_incomplete_multipart_upload_days = 7
+    enabled                                = true
+    id                                     = "rax-cleanup-incomplete-mpu-objects"
+    expiration                             = [{}]
   }
 }
 
