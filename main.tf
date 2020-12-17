@@ -155,6 +155,8 @@ resource "aws_lb_target_group" "main" {
   target_type          = lookup(var.target_groups[count.index], "target_type", lookup(local.target_groups_defaults, "target_type"))
   vpc_id               = var.vpc_id
 
+  load_balancing_algorithm_type = lookup(var.target_groups[count.index], "load_balancing_algorithm_type", lookup(local.target_groups_defaults, "load_balancing_algorithm_type"))
+
   health_check {
     healthy_threshold   = lookup(var.target_groups[count.index], "health_check_healthy_threshold", lookup(local.target_groups_defaults, "health_check_healthy_threshold"))
     interval            = lookup(var.target_groups[count.index], "health_check_interval", lookup(local.target_groups_defaults, "health_check_interval"))
