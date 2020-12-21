@@ -72,13 +72,6 @@ The following module variables were updated to better meet current Rackspace sty
 - `logging_bucket_encryption_kms_mster_key` -> `kms_key_id`
 - `route_53_hosted_zone_id` -> `internal_zone_id`
 
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 0.12 |
-| aws | >= 2.7.0 |
-
 ## Providers
 
 | Name | Version |
@@ -89,7 +82,7 @@ The following module variables were updated to better meet current Rackspace sty
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+|------|-------------|------|---------|:-----:|
 | add\_waf | Add an existing Regional WAF to the ALB. true \| false | `bool` | `false` | no |
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the ALB. i.e true \| false | `bool` | `false` | no |
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `true` | no |
@@ -115,7 +108,7 @@ The following module variables were updated to better meet current Rackspace sty
 | logging\_bucket\_encyption | Enable default bucket encryption. i.e. AES256 \| aws:kms | `string` | `"AES256"` | no |
 | logging\_bucket\_force\_destroy | Whether all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. ie. true \| false | `bool` | `false` | no |
 | logging\_bucket\_name | The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name. | `string` | `""` | no |
-| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | `null` | no |
+| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | n/a | yes |
 | logging\_bucket\_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | `number` | `14` | no |
 | logging\_enabled | Whether logging for this bucket is enabled. | `bool` | `false` | no |
 | name | A name for the load balancer, which must be unique within your AWS account. | `string` | n/a | yes |
