@@ -243,7 +243,7 @@ variable "target_groups_count" {
 }
 
 variable "target_groups_defaults" {
-  description = "Default values for target groups as defined by the list of maps. i.e. [{ 'cookie_duration': 86400, 'deregistration_delay': 300, 'health_check_healthy_threshold': 3, 'health_check_interval': 10, 'health_check_matcher': '200-299', 'health_check_path': '/', 'health_check_port': 'traffic-port', 'health_check_timeout': 5, 'health_check_unhealthy_threshold': 3, 'stickiness_enabled': true, 'load_balancing_algorithm_type': 'round-robin', 'target_type': 'instance' }]"
+  description = "Default values for target groups as defined by the list of maps. i.e. [{ 'cookie_duration': 86400, 'deregistration_delay': 300, 'health_check_healthy_threshold': 3, 'health_check_interval': 10, 'health_check_matcher': '200-299', 'health_check_path': '/', 'health_check_port': 'traffic-port', 'health_check_timeout': 5, 'health_check_unhealthy_threshold': 3, 'stickiness_enabled': true, 'load_balancing_algorithm_type': 'round_robin', 'target_type': 'instance' }]"
   type        = list(map(string))
 
   default = [
