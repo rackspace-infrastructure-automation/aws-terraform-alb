@@ -72,6 +72,13 @@ The following module variables were updated to better meet current Rackspace sty
 - `logging_bucket_encryption_kms_mster_key` -> `kms_key_id`
 - `route_53_hosted_zone_id` -> `internal_zone_id`
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| aws | >= 2.7.0 |
+
 ## Providers
 
 | Name | Version |
@@ -82,7 +89,7 @@ The following module variables were updated to better meet current Rackspace sty
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | add\_waf | Add an existing Regional WAF to the ALB. true \| false | `bool` | `false` | no |
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the ALB. i.e true \| false | `bool` | `false` | no |
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `true` | no |
@@ -108,7 +115,7 @@ The following module variables were updated to better meet current Rackspace sty
 | logging\_bucket\_encyption | Enable default bucket encryption. i.e. AES256 \| aws:kms | `string` | `"AES256"` | no |
 | logging\_bucket\_force\_destroy | Whether all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. ie. true \| false | `bool` | `false` | no |
 | logging\_bucket\_name | The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name. | `string` | `""` | no |
-| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | n/a | yes |
+| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | `null` | no |
 | logging\_bucket\_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | `number` | `14` | no |
 | logging\_enabled | Whether logging for this bucket is enabled. | `bool` | `false` | no |
 | name | A name for the load balancer, which must be unique within your AWS account. | `string` | n/a | yes |
@@ -120,9 +127,9 @@ The following module variables were updated to better meet current Rackspace sty
 | security\_groups | A list of EC2 security group ids to assign to this resource. i.e. ['sg-edcd9784', 'sg-edcd9785'] | `list(string)` | n/a | yes |
 | subnets | A list of at least two IDs of the subnets to associate with the load balancer. i.e ['subnet-abcde012', 'subnet-bcde012a'] | `list(string)` | n/a | yes |
 | tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | `map(string)` | `{}` | no |
-| target\_groups | A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target\_groups\_defaults variable. i.e. [{'name', 'foo', 'backend\_protocol', 'HTTP', 'backend\_port', '80'}] | `list(map(string))` | <pre>[<br>  {<br>    "backend_port": 80,<br>    "backend_protocol": "HTTP",<br>    "name": "ALB-TargetGroup",<br>    "load_balancing_algorithm_type": "round-robin",<br>  }<br>]</pre> | no |
+| target\_groups | A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Optional key/values are in the target\_groups\_defaults variable. i.e. [{'name', 'foo', 'backend\_protocol', 'HTTP', 'backend\_port', '80'}] | `list(map(string))` | <pre>[<br>  {<br>    "backend_port": 80,<br>    "backend_protocol": "HTTP",<br>    "name": "ALB-TargetGroup"<br>  }<br>]</pre> | no |
 | target\_groups\_count | The number of target groups to create | `number` | `1` | no |
-| target\_groups\_defaults | Default values for target groups as defined by the list of maps. i.e. [{ 'cookie\_duration': 86400, 'deregistration\_delay': 300, 'health\_check\_healthy\_threshold': 3, 'health\_check\_interval': 10, 'health\_check\_matcher': '200-299', 'health\_check\_path': '/', 'health\_check\_port': 'traffic-port', 'health\_check\_timeout': 5, 'health\_check\_unhealthy\_threshold': 3, 'stickiness\_enabled': true, 'target\_type': 'instance' }] | `list(map(string))` | <pre>[<br>  {<br>    "cookie_duration": 86400,<br>    "deregistration_delay": 30,<br>    "health_check_healthy_threshold": 5,<br>    "health_check_interval": 30,<br>    "health_check_matcher": "200-299",<br>    "health_check_path": "/",<br>    "health_check_port": "traffic-port",<br>    "health_check_timeout": 5,<br>    "health_check_unhealthy_threshold": 2,<br>    "slow_start": 0,<br>    "stickiness_enabled": false,<br>    "target_type": "instance"<br>  }<br>]</pre> | no |
+| target\_groups\_defaults | Default values for target groups as defined by the list of maps. i.e. [{ 'cookie\_duration': 86400, 'deregistration\_delay': 300, 'health\_check\_healthy\_threshold': 3, 'health\_check\_interval': 10, 'health\_check\_matcher': '200-299', 'health\_check\_path': '/', 'health\_check\_port': 'traffic-port', 'health\_check\_timeout': 5, 'health\_check\_unhealthy\_threshold': 3, 'stickiness\_enabled': true, 'load\_balancing\_algorithm\_type': 'round-robin', 'target\_type': 'instance' }] | `list(map(string))` | <pre>[<br>  {<br>    "cookie_duration": 86400,<br>    "deregistration_delay": 30,<br>    "health_check_healthy_threshold": 5,<br>    "health_check_interval": 30,<br>    "health_check_matcher": "200-299",<br>    "health_check_path": "/",<br>    "health_check_port": "traffic-port",<br>    "health_check_timeout": 5,<br>    "health_check_unhealthy_threshold": 2,<br>    "load_balancing_algorithm_type": "round-robin",<br>    "slow_start": 0,<br>    "stickiness_enabled": false,<br>    "target_type": "instance"<br>  }<br>]</pre> | no |
 | vpc\_id | The VPC in which your targets are located. i.e. vpc-abcde012 | `string` | n/a | yes |
 | waf\_id | The unique identifier (ID) for the Regional Web Application Firewall (WAF) ACL. i.e. 329d10ec-e221-49d1-9f4b-e1294150d292 | `string` | `""` | no |
 
