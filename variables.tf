@@ -257,7 +257,7 @@ variable "target_groups_defaults" {
       "health_check_port"                = "traffic-port"
       "health_check_timeout"             = 5
       "health_check_unhealthy_threshold" = 2
-      "load_balancing_algorithm_type"    = "round-robin"
+      "load_balancing_algorithm_type"    = "round_robin"
       "stickiness_enabled"               = false
       "slow_start"                       = 0
       "target_type"                      = "instance"
