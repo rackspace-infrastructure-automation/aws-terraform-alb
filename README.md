@@ -72,6 +72,13 @@ The following module variables were updated to better meet current Rackspace sty
 - `logging_bucket_encryption_kms_mster_key` -> `kms_key_id`
 - `route_53_hosted_zone_id` -> `internal_zone_id`
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| aws | >= 2.7.0 |
+
 ## Providers
 
 | Name | Version |
@@ -79,10 +86,34 @@ The following module variables were updated to better meet current Rackspace sty
 | aws | >= 2.7.0 |
 | null | n/a |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| unhealthy_host_count_alarm | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=0.12.6 |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_elb_service_account](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/elb_service_account) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/iam_policy_document) |
+| [aws_lb](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb) |
+| [aws_lb_listener](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener) |
+| [aws_lb_listener_certificate](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener_certificate) |
+| [aws_lb_listener_rule](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener_rule) |
+| [aws_lb_target_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_target_group) |
+| [aws_lb_target_group_attachment](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_target_group_attachment) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/route53_record) |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/s3_bucket) |
+| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/s3_bucket_policy) |
+| [aws_wafregional_web_acl_association](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/wafregional_web_acl_association) |
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | add\_waf | Add an existing Regional WAF to the ALB. true \| false | `bool` | `false` | no |
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the ALB. i.e true \| false | `bool` | `false` | no |
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `true` | no |
@@ -104,11 +135,11 @@ The following module variables were updated to better meet current Rackspace sty
 | load\_balancer\_delete\_timeout | Timeout value when deleting the ALB. | `string` | `"10m"` | no |
 | load\_balancer\_is\_internal | Indicates whether the load balancer is Internet-facing or internal. i.e. true \| false | `bool` | `false` | no |
 | load\_balancer\_update\_timeout | Timeout value when updating the ALB. | `string` | `"10m"` | no |
-| logging\_bucket\_acl | Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl | `string` | `"bucket-owner-full-control"` | no |
+| logging\_bucket\_acl | Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl | `string` | `"private"` | no |
 | logging\_bucket\_encyption | Enable default bucket encryption. i.e. AES256 \| aws:kms | `string` | `"AES256"` | no |
 | logging\_bucket\_force\_destroy | Whether all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. ie. true \| false | `bool` | `false` | no |
 | logging\_bucket\_name | The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name. | `string` | `""` | no |
-| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | n/a | yes |
+| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | `null` | no |
 | logging\_bucket\_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | `number` | `14` | no |
 | logging\_enabled | Whether logging for this bucket is enabled. | `bool` | `false` | no |
 | name | A name for the load balancer, which must be unique within your AWS account. | `string` | n/a | yes |
@@ -148,4 +179,3 @@ The following module variables were updated to better meet current Rackspace sty
 | target\_group\_arns | ARNs of the target groups. Useful for passing to your Auto Scaling group. |
 | target\_group\_names | Name of the target group. Useful for passing to your CodeDeploy Deployment Group. |
 | unhealthy\_host\_alarm\_id | The ID of the health check. |
-
