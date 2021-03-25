@@ -86,9 +86,9 @@ terraform {
 data "aws_elb_service_account" "main" {}
 
 locals {
-  acl_list = ["authenticated-read", "aws-exec-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write", "private", "public-read", "public-read-write"]
+  acl_list = ["authenticated-read", "aws-exec-read", "log-delivery-write", "private", "public-read", "public-read-write"]
 
-  bucket_acl = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
+  bucket_acl = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "private"
 
   default_tags = {
     ServiceProvider = "Rackspace"
@@ -324,7 +324,7 @@ data "null_data_source" "alarm_dimensions" {
 }
 
 module "unhealthy_host_count_alarm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=0.12.6"
 
   alarm_count              = var.target_groups_count > 0 ? var.target_groups_count : 0
   alarm_description        = "Unhealthy Host count is greater than or equal to threshold, creating ticket."

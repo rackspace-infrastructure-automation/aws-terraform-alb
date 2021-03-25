@@ -131,9 +131,9 @@ variable "load_balancer_update_timeout" {
 }
 
 variable "logging_bucket_acl" {
-  description = "Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl"
+  description = "Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl"
   type        = string
-  default     = "bucket-owner-full-control"
+  default     = "private"
 }
 
 variable "logging_bucket_encyption" {
