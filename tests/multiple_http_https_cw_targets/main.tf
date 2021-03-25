@@ -90,9 +90,12 @@ resource "aws_instance" "test02" {
   subnet_id     = module.vpc.public_subnets[1]
 }
 
-data "aws_acm_certificate" "cert" {
-  domain      = "test.mupo181ve1jco37.net"
-  most_recent = true
+module "cert" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-acm//?ref=v0.12.3"
+
+  environment = "Test"
+  fqdn_list   = ["${random_string.rstring.result}-test.mupo181ve1jco37.net"]
+  self_signed = true
 }
 
 module "alb" {
@@ -125,7 +128,7 @@ module "alb" {
 
   https_listeners = [
     {
-      certificate_arn = data.aws_acm_certificate.cert.arn
+      certificate_arn = module.cert.arn
       port            = 443
     },
   ]
