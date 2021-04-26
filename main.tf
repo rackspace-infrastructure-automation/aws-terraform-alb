@@ -324,7 +324,7 @@ data "null_data_source" "alarm_dimensions" {
 }
 
 module "unhealthy_host_count_alarm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=0.12.6"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6"
 
   alarm_count              = var.target_groups_count > 0 ? var.target_groups_count : 0
   alarm_description        = "Unhealthy Host count is greater than or equal to threshold, creating ticket."
