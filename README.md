@@ -117,6 +117,8 @@ The following module variables were updated to better meet current Rackspace sty
 | add\_waf | Add an existing Regional WAF to the ALB. true \| false | `bool` | `false` | no |
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the ALB. i.e true \| false | `bool` | `false` | no |
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `true` | no |
+| customer\_alarms\_cleared | Specifies whether alarms will notify customers when returning to an OK status. | `bool` | `false` | no |
+| customer\_alarms\_enabled | Specifies whether alarms will notify customers.  Automatically enabled if rackspace\_managed is set to false | `bool` | `false` | no |
 | enable\_deletion\_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | `bool` | `false` | no |
 | enable\_http2 | If true sets HTTP/2 to enabled. | `bool` | `true` | no |
 | enable\_https\_redirect | If true and at least one HTTP and one HTTPS listener is created, HTTP listeners will have a redirect rule created to forward all traffic to the first HTTPS listener. | `bool` | `false` | no |

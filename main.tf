@@ -330,6 +330,8 @@ module "unhealthy_host_count_alarm" {
   alarm_description        = "Unhealthy Host count is greater than or equal to threshold, creating ticket."
   alarm_name               = "${var.name}_unhealthy_host_count_alarm"
   comparison_operator      = "GreaterThanOrEqualToThreshold"
+  customer_alarms_cleared  = var.customer_alarms_cleared
+  customer_alarms_enabled  = var.customer_alarms_enabled
   dimensions               = data.null_data_source.alarm_dimensions.*.outputs
   evaluation_periods       = 10
   metric_name              = "UnHealthyHostCount"

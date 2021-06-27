@@ -16,6 +16,18 @@ variable "create_logging_bucket" {
   default     = true
 }
 
+variable "customer_alarms_cleared" {
+  description = "Specifies whether alarms will notify customers when returning to an OK status."
+  type        = bool
+  default     = false
+}
+
+variable "customer_alarms_enabled" {
+  description = "Specifies whether alarms will notify customers.  Automatically enabled if rackspace_managed is set to false"
+  type        = bool
+  default     = false
+}
+
 variable "enable_deletion_protection" {
   description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false."
   type        = bool
