@@ -2,7 +2,7 @@
 data "aws_availability_zones" "available" {}
 
 provider "aws" {
-  version = "~> 1.2"
+  version = "~> 2.70"
   region  = "us-west-2"
 }
 
@@ -33,7 +33,7 @@ resource "aws_security_group" "test_sg" {
 }
 
 module "vpc" {
-  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=master"
+  source              = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=tf_v0.11"
   az_count            = 2
   cidr_range          = "10.0.0.0/16"
   public_cidr_ranges  = ["10.0.1.0/24", "10.0.3.0/24"]
