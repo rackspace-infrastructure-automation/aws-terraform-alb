@@ -31,6 +31,10 @@ module "alb" {
 
 Full working references are available at [examples](examples)
 
+## Requirements
+
+No requirements.
+
 ## Providers
 
 | Name | Version |
@@ -38,10 +42,30 @@ Full working references are available at [examples](examples)
 | aws | n/a |
 | null | n/a |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| alb | terraform-aws-modules/alb/aws | 3.5.0 |
+| unhealthy_host_count_alarm | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1 |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_elb_service_account](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/elb_service_account) |
+| [aws_lb_listener_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) |
+| [aws_lb_target_group_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group_attachment) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) |
+| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) |
+| [aws_wafregional_web_acl_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafregional_web_acl_association) |
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | add\_waf | Add an existing Regional WAF to the ALB. true \| false | `string` | `false` | no |
 | alb\_name | A name for the load balancer, which must be unique within your AWS account. | `string` | n/a | yes |
 | alb\_tags | A map of tags to be applied to the ALB. i.e {Environment='Development'} | `map` | `{}` | no |
@@ -103,4 +127,3 @@ Full working references are available at [examples](examples)
 | target\_group\_arns | ARNs of the target groups. Useful for passing to your Auto Scaling group. |
 | target\_group\_names | Name of the target group. Useful for passing to your CodeDeploy Deployment Group. |
 | unhealthy\_host\_alarm\_id | The ID of the health check. |
-
