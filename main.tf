@@ -120,7 +120,7 @@ resource "aws_lb" "alb" {
   name                       = var.name
   security_groups            = var.security_groups
   subnets                    = var.subnets
-  tags                       = merge(local.merged_tags, map("Name", var.name))
+  tags                       = merge(local.merged_tags, tomap({ Name = var.name }))
 
   dynamic "access_logs" {
     for_each = [for al in local.access_logs : al if al.enabled]
@@ -151,7 +151,7 @@ resource "aws_lb_target_group" "main" {
   port                 = lookup(var.target_groups[count.index], "backend_port")
   protocol             = upper(lookup(var.target_groups[count.index], "backend_protocol"))
   slow_start           = lookup(var.target_groups[count.index], "slow_start", lookup(local.target_groups_defaults, "slow_start"))
-  tags                 = merge(local.merged_tags, map("Name", lookup(var.target_groups[count.index], "name")))
+  tags                 = merge(local.merged_tags, tomap({ Name = lookup(var.target_groups[count.index], "name") }))
   target_type          = lookup(var.target_groups[count.index], "target_type", lookup(local.target_groups_defaults, "target_type"))
   vpc_id               = var.vpc_id
 
