@@ -15,7 +15,7 @@ variable "life_cycle_rule_enabled" {
 }
 
 variable "abort_incomplete_multipart_upload_days_count" {
-  description = "Abort Incomplete Multipart Upload Days i.e. 7 | 0"
+  description = "Abort Incomplete Multipart Upload Days i.e. 7 or 0"
   type        = "string"
   default     = 7
 }
