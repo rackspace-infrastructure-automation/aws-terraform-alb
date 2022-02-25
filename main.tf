@@ -151,9 +151,9 @@ resource "aws_s3_bucket" "log_bucket" {
     abort_incomplete_multipart_upload_days  = 7
    # prefix                                 = "${var.logging_bucket_prefix}"
 
-    expiration {
-      days = "${var.logging_bucket_retention}"
-    }
+   # expiration {
+    #  days = "${var.logging_bucket_retention}"
+   # }
   }
 }
 
