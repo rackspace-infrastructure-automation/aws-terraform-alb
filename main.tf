@@ -127,8 +127,9 @@ resource "aws_s3_bucket" "log_bucket" {
   }
 
   lifecycle_rule {
-    enabled = true
-    prefix  = "${var.logging_bucket_prefix}"
+    enabled                                = "${var.life_cycle_rule_enabled}"
+    abort_incomplete_multipart_upload_days = "${var.abort_incomplete_multipart_upload_days_count}"
+    prefix                                 = "${var.logging_bucket_prefix}"
 
     expiration {
       days = "${var.logging_bucket_retention}"

@@ -3,6 +3,18 @@ variable "alb_name" {
   type        = "string"
 }
 
+variable "life_cycle_rule_enabled" {
+  description = "should be true or false"
+  type        = "string"
+  default     = true
+}
+
+variable "abort_incomplete_multipart_upload_days_count" {
+  description = "Abort Incomplete Multipart Upload Days i.e. 7 | 0"
+  type        = "string"
+  default     = 7
+}
+
 variable "alb_tags" {
   description = "A map of tags to be applied to the ALB. i.e {Environment='Development'}"
   type        = "map"
