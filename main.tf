@@ -126,15 +126,15 @@ resource "aws_s3_bucket" "log_bucket" {
     }
   }
 
-  lifecycle_rule {
-    enabled                                = "${var.life_cycle_rule_enabled}"
-    abort_incomplete_multipart_upload_days = "${var.abort_incomplete_multipart_upload_days_count}"
-    prefix                                 = "${var.logging_bucket_prefix}"
+  #lifecycle_rule {
+   # enabled                                = "${var.life_cycle_rule_enabled}"
+   # abort_incomplete_multipart_upload_days = "${var.abort_incomplete_multipart_upload_days_count}"
+   # prefix                                 = "${var.logging_bucket_prefix}"
 
-    expiration {
-      days = "${var.logging_bucket_retention}"
-    }
-  }
+   # expiration {
+    #  days = "${var.logging_bucket_retention}"
+   # }
+ # }
 }
 
 # s3 policy needs to be separate since you can't reference the bucket for the reference.
