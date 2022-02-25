@@ -136,6 +136,16 @@ resource "aws_s3_bucket" "log_bucket" {
    # }
  # }
   lifecycle_rule {
+    id                                      = "tf-s3-lifecycle-20200514115745544000000005"
+    enabled                                 = true
+    abort_incomplete_multipart_upload_days  = 0
+   # prefix                                 = "${var.logging_bucket_prefix}"
+
+    expiration {
+      days = "${var.logging_bucket_retention}"
+    }
+  }
+  lifecycle_rule {
     id                                      = "rax-cleanup-incomplete-mpu-objects"
     enabled                                 = true
     abort_incomplete_multipart_upload_days  = 7
