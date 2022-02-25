@@ -3,6 +3,11 @@ variable "alb_name" {
   type        = "string"
 }
 
+variable "lifecycle_rules" {
+  type = "list"
+  default = []
+}
+
 variable "life_cycle_rule_enabled" {
   description = "should be true or false"
   type        = "string"
