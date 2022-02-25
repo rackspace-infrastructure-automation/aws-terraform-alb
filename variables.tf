@@ -1,5 +1,5 @@
 variable "alb_name" {
-  description = "A name for the load balancer, which must be unique within your AWS account."
+  description = "A name for the load balancer, which must be unique within your AWS accounts."
   type        = "string"
 }
 
