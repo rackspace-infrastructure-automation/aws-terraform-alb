@@ -86,6 +86,31 @@ The following module variables were updated to better meet current Rackspace sty
 | aws | >= 2.7.0 |
 | null | n/a |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| unhealthy_host_count_alarm | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_elb_service_account](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/elb_service_account) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/iam_policy_document) |
+| [aws_lb](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb) |
+| [aws_lb_listener](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener) |
+| [aws_lb_listener_certificate](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener_certificate) |
+| [aws_lb_listener_rule](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener_rule) |
+| [aws_lb_target_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_target_group) |
+| [aws_lb_target_group_attachment](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_target_group_attachment) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/route53_record) |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/s3_bucket) |
+| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/s3_bucket_policy) |
+| [aws_wafregional_web_acl_association](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/wafregional_web_acl_association) |
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
+
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
