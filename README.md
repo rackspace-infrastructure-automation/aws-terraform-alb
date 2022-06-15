@@ -86,30 +86,6 @@ The following module variables were updated to better meet current Rackspace sty
 | aws | >= 2.7.0 |
 | null | n/a |
 
-## Modules
-
-| Name | Source | Version |
-|------|--------|---------|
-| unhealthy_host_count_alarm | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
-
-## Resources
-
-| Name |
-|------|
-| [aws_elb_service_account](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/elb_service_account) |
-| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/iam_policy_document) |
-| [aws_lb](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb) |
-| [aws_lb_listener](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener) |
-| [aws_lb_listener_certificate](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener_certificate) |
-| [aws_lb_listener_rule](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_listener_rule) |
-| [aws_lb_target_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_target_group) |
-| [aws_lb_target_group_attachment](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/lb_target_group_attachment) |
-| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/route53_record) |
-| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/s3_bucket) |
-| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/s3_bucket_policy) |
-| [aws_wafregional_web_acl_association](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/wafregional_web_acl_association) |
-| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -119,6 +95,7 @@ The following module variables were updated to better meet current Rackspace sty
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `true` | no |
 | customer\_alarms\_cleared | Specifies whether alarms will notify customers when returning to an OK status. | `bool` | `false` | no |
 | customer\_alarms\_enabled | Specifies whether alarms will notify customers.  Automatically enabled if rackspace\_managed is set to false | `bool` | `false` | no |
+| drop\_invalid\_header\_fields | Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). | `bool` | `false` | no |
 | enable\_deletion\_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | `bool` | `false` | no |
 | enable\_http2 | If true sets HTTP/2 to enabled. | `bool` | `true` | no |
 | enable\_https\_redirect | If true and at least one HTTP and one HTTPS listener is created, HTTP listeners will have a redirect rule created to forward all traffic to the first HTTPS listener. | `bool` | `false` | no |
@@ -181,3 +158,4 @@ The following module variables were updated to better meet current Rackspace sty
 | target\_group\_arns | ARNs of the target groups. Useful for passing to your Auto Scaling group. |
 | target\_group\_names | Name of the target group. Useful for passing to your CodeDeploy Deployment Group. |
 | unhealthy\_host\_alarm\_id | The ID of the health check. |
+

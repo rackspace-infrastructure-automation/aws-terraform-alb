@@ -111,6 +111,7 @@ locals {
 }
 
 resource "aws_lb" "alb" {
+  drop_invalid_header_fields = var.drop_invalid_header_fields
   enable_deletion_protection = var.enable_deletion_protection
   enable_http2               = var.enable_http2
   idle_timeout               = var.idle_timeout
