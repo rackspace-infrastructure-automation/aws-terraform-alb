@@ -28,6 +28,12 @@ variable "customer_alarms_enabled" {
   default     = false
 }
 
+variable "drop_invalid_header_fields" {
+  description = "Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false)."
+  type        = bool
+  default     = false
+}
+
 variable "enable_deletion_protection" {
   description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false."
   type        = bool
