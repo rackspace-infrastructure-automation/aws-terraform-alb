@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This project is end of life. This repo will be deleted on June 2nd 2025.
+
 # aws-terraform-alb  
 This module deploys an Application Load Balancer with associated resources, such as an unhealthy host count CloudWatch alarm, S3 log bucket, and Route 53 internal zone record.
 
